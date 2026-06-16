@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zombie Apocalypse Character Sheet</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.4;
+            background: #1a1a1a;
+            color: #f0f0f0;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #2a2a2a;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            font-size: 2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        h2 {
+            background: #3a3a3a;
+            padding: 10px;
+            margin: 20px 0 10px 0;
+            border-radius: 5px;
+            color: #4ecdc4;
+            border-left: 4px solid #ff6b6b;
+        }
+        
+        .section {
+            background: #333;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #444;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #4ecdc4;
+            font-size: 0.9em;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #555;
+            border-radius: 3px;
+            background: #444;
+            color: #f0f0f0;
+            font-size: 14px;
+        }
+        
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin: 0 5px;
+            vertical-align: middle;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .stat-box {
+            text-align: center;
+            background: #444;
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #555;
+        }
+        
+        .stat-box input {
+            width: 50px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .stat-modifier {
+            font-size: 14px;
+            color: #4ecdc4;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .save-box {
+            text-align: center;
+            background: #444;
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #555;
+            min-width: 60px;
+        }
+        
+        .save-box input {
+            width: 40px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .save-modifier {
+            font-size: 12px;
+            color: #4ecdc4;
+            font-weight: bold;
+            margin-top: 3px;
+        }
+        
+        
+        .status-trackers {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tracker {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .tracker-options {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
+        
+        .tracker-option {
+            padding: 5px 10px;
+            border: 1px solid #555;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tracker-option.active {
+            background: #4ecdc4;
+            border-color: #4ecdc4;
+            color: #000;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #555;
+        }
+        
+        th {
+            background: #3a3a3a;
+            color: #4ecdc4;
+            font-weight: bold;
+        }
+        
+        .proficiency-checkboxes {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: #4ecdc4;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background: #3db8af;
+            transform: translateY(-2px);
+        }
+        
+        .equipment-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+        
+        .equipment-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px;
+            background: #444;
+            border-radius: 3px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .hp-tracker {
+                grid-template-columns: repeat(5, 1fr);
+            }
+            
+            .status-trackers {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DEAD WORLD CHARACTER SHEET</h1>
+        
+        <div class="button-group">
+            <button onclick="saveCharacter()">Save Character</button>
+            <button onclick="loadCharacter()">Load Character</button>
+            <button onclick="exportCharacter()">Export Character</button>
+            <button onclick="document.getElementById('importFile').click()">Import Character</button>
+            <button onclick="clearCharacter()">Clear All</button>
+            <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importCharacter(event)">
+        </div>
+
+        <div class="section">
+            <h2>CHARACTER INFO</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">NAME:</label>
+                    <input type="text" id="name" placeholder="Character name">
+                </div>
+                <div class="form-group">
+                    <label for="age">AGE:</label>
+                    <input type="text" id="age" placeholder="Age">
+                </div>
+                <div class="form-group">
+                    <label for="gender">GENDER:</label>
+                    <select id="gender">
+                        <option value="">Select...</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="background">BACKGROUND:</label>
+                <input type="text" id="background" placeholder="Pre-apocalypse life">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="startingProfession">STARTING PROFESSION:</label>
+                    <input type="text" id="startingProfession" placeholder="From Appendix C">
+                </div>
+                <div class="form-group">
+                    <label for="currentProfessions">CURRENT PROFESSIONS:</label>
+                    <input type="text" id="currentProfessions" placeholder="List all current professions">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>CORE STATS</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <label>STR</label>
+                    <input type="text" id="str" onchange="updateStatModifiers()">
+                    <div class="stat-modifier" id="strMod">+0</div>
+                </div>
+                <div class="stat-box">
+                    <label>DEX</label>
+                    <input type="text" id="dex" onchange="updateStatModifiers()">
+                    <div class="stat-modifier" id="dexMod">+0</div>
+                </div>
+                <div class="stat-box">
+                    <label>CON</label>
+                    <input type="text" id="con" onchange="updateStatModifiers()">
+                    <div class="stat-modifier" id="conMod">+0</div>
+                </div>
+                <div class="stat-box">
+                    <label>INT</label>
+                    <input type="text" id="int" onchange="updateStatModifiers()">
+                    <div class="stat-modifier" id="intMod">+0</div>
+                </div>
+                <div class="stat-box">
+                    <label>WIS</label>
+                    <input type="text" id="wis" onchange="updateStatModifiers()">
+                    <div class="stat-modifier" id="wisMod">+0</div>
+                </div>
+                <div class="stat-box">
+                    <label>CHA</label>
+                    <input type="text" id="cha" onchange="updateStatModifiers()">
+                    <div class="stat-modifier" id="chaMod">+0</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="hp">HP:</label>
+                    <input type="text" id="hp" placeholder="Current/Max">
+                </div>
+                <div class="form-group">
+                    <label for="ac">AC:</label>
+                    <input type="text" id="ac" placeholder="AC">
+                </div>
+                <div class="form-group">
+                    <label for="speed">SPEED:</label>
+                    <input type="text" id="speed" placeholder="Speed">
+                </div>
+                <div class="form-group">
+                    <label for="initiative">INITIATIVE:</label>
+                    <input type="text" id="initiative" placeholder="+X">
+                </div>
+                <div class="form-group">
+                    <label for="proficiency">PROFICIENCY:</label>
+                    <input type="text" id="proficiency" placeholder="+X" onchange="updateStatModifiers()">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>STATUS TRACKERS</h2>
+            <div class="status-trackers">
+                <div class="tracker">
+                    <label>STRESS LEVEL:</label>
+                    <div class="tracker-options">
+                        <div class="tracker-option" data-stress="0">0</div>
+                        <div class="tracker-option" data-stress="1">1</div>
+                        <div class="tracker-option" data-stress="2">2</div>
+                        <div class="tracker-option" data-stress="3">3</div>
+                        <div class="tracker-option" data-stress="4">4</div>
+                        <div class="tracker-option" data-stress="5">5</div>
+                    </div>
+                </div>
+                <div class="tracker">
+                    <label>INFECTION:</label>
+                    <div class="tracker-options">
+                        <div class="tracker-option" data-infection="clean">CLEAN</div>
+                        <div class="tracker-option" data-infection="bitten">BITTEN</div>
+                        <div class="tracker-option" data-infection="infected">INFECTED</div>
+                        <div class="tracker-option" data-infection="s1">S1</div>
+                        <div class="tracker-option" data-infection="s2">S2</div>
+                        <div class="tracker-option" data-infection="s3">S3</div>
+                        <div class="tracker-option" data-infection="s4">S4</div>
+                    </div>
+                </div>
+                <div class="tracker">
+                    <label>EXHAUSTION:</label>
+                    <div class="tracker-options">
+                        <div class="tracker-option" data-exhaustion="0">0</div>
+                        <div class="tracker-option" data-exhaustion="1">1</div>
+                        <div class="tracker-option" data-exhaustion="2">2</div>
+                        <div class="tracker-option" data-exhaustion="3">3</div>
+                        <div class="tracker-option" data-exhaustion="4">4</div>
+                        <div class="tracker-option" data-exhaustion="5">5</div>
+                        <div class="tracker-option" data-exhaustion="6">6</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="section">
+            <h2>SAVING THROWS</h2>
+            <div class="stats-grid">
+                <div class="save-box">
+                    <label>STR</label>
+                    <div class="save-modifier" id="strSave">+0</div>
+                </div>
+                <div class="save-box">
+                    <label>DEX</label>
+                    <div class="save-modifier" id="dexSave">+0</div>
+                </div>
+                <div class="save-box">
+                    <label>CON</label>
+                    <div class="save-modifier" id="conSave">+0</div>
+                </div>
+                <div class="save-box">
+                    <label>INT</label>
+                    <div class="save-modifier" id="intSave">+0</div>
+                </div>
+                <div class="save-box">
+                    <label>WIS</label>
+                    <div class="save-modifier" id="wisSave">+0</div>
+                </div>
+                <div class="save-box">
+                    <label>CHA</label>
+                    <div class="save-modifier" id="chaSave">+0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>SKILLS</h2>
+            <table id="skillsTable">
+                <thead>
+                    <tr>
+                        <th>SKILL</th>
+                        <th>MODIFIER</th>
+                        <th>PROFICIENCY</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Skills will be generated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>PROFESSIONS</h2>
+            <table id="professionsTable">
+                <thead>
+                    <tr>
+                        <th>PROFESSION</th>
+                        <th>LEVEL</th>
+                        <th>XP</th>
+                        <th>NEXT LEVEL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" class="profession-name"></td>
+                        <td><input type="number" class="profession-level" min="0" max="6"></td>
+                        <td><input type="number" class="profession-xp" min="0"></td>
+                        <td><input type="number" class="profession-next" min="0"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button onclick="addProfessionRow()">Add Profession</button>
+            <div class="form-group">
+                <label for="lifeHacks">LIFE HACKS:</label>
+                <textarea id="lifeHacks" rows="3" placeholder="List unlocked life hacks"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>WEAPONS</h2>
+            <table id="weaponsTable">
+                <thead>
+                    <tr>
+                        <th>WEAPON</th>
+                        <th>+HIT</th>
+                        <th>DAMAGE</th>
+                        <th>AMMO</th>
+                        <th>NOTES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" class="weapon-name"></td>
+                        <td><input type="text" class="weapon-hit"></td>
+                        <td><input type="text" class="weapon-damage"></td>
+                        <td><input type="text" class="weapon-ammo"></td>
+                        <td><input type="text" class="weapon-notes"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button onclick="addWeaponRow()">Add Weapon</button>
+        </div>
+
+        <div class="section">
+            <h2>ARMOR & EQUIPMENT (Head to Feet)</h2>
+            <div class="equipment-slots">
+                <div class="form-group">
+                    <label for="head">HEAD:</label>
+                    <input type="text" id="head" placeholder="Helmet, hat, etc.">
+                </div>
+                <div class="form-group">
+                    <label for="neck">NECK:</label>
+                    <input type="text" id="neck" placeholder="Necklace, scarf, etc.">
+                </div>
+                <div class="form-group">
+                    <label for="body">BODY (ARMOR):</label>
+                    <input type="text" id="body" placeholder="Armor type (AC X)">
+                </div>
+                <div class="form-group">
+                    <label for="back">BACK:</label>
+                    <input type="text" id="back" placeholder="Backpack, cloak, etc.">
+                </div>
+                <div class="form-group">
+                    <label for="hands">HANDS:</label>
+                    <input type="text" id="hands" placeholder="Gloves, rings, etc.">
+                </div>
+                <div class="form-group">
+                    <label for="waist">WAIST:</label>
+                    <input type="text" id="waist" placeholder="Belt, pouches, etc.">
+                </div>
+                <div class="form-group">
+                    <label for="legs">LEGS:</label>
+                    <input type="text" id="legs" placeholder="Pants, leg armor, etc.">
+                </div>
+                <div class="form-group">
+                    <label for="feet">FEET:</label>
+                    <input type="text" id="feet" placeholder="Boots, shoes, etc.">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="biteProtection">BITE PROTECTION:</label>
+                <input type="text" id="biteProtection" placeholder="Yes/No/Partial">
+            </div>
+            <div class="form-group">
+                <label for="shield">SHIELD:</label>
+                <input type="text" id="shield" placeholder="Shield (+X AC)">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>RESOURCES</h2>
+            <div class="form-group">
+                <label for="food">FOOD:</label>
+                <textarea id="food" rows="3" placeholder="List food items and quantities&#10;- Canned goods: 5&#10;- Fresh meat: 2 lbs&#10;- Rations: 10 days"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="water">WATER:</label>
+                <textarea id="water" rows="3" placeholder="List water sources and quantities&#10;- Water bottles: 6&#10;- Canteens: 2&#10;- Purified water: 5 gallons"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="medicalSupplies">MEDICAL SUPPLIES:</label>
+                <textarea id="medicalSupplies" rows="3" placeholder="List medical supplies&#10;- Bandages: 10&#10;- Medkits: 2&#10;- Antibiotics: 5 doses"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="studyMaterials">STUDY MATERIALS:</label>
+                <textarea id="studyMaterials" rows="3" placeholder="List study materials&#10;- Medical textbook&#10;- Engineering manual&#10;- Chemistry notes"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>ALLIES & CONTACTS</h2>
+            <table id="alliesTable">
+                <thead>
+                    <tr>
+                        <th>NAME</th>
+                        <th>LOCATION</th>
+                        <th>NOTES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" class="ally-name"></td>
+                        <td><input type="text" class="ally-location"></td>
+                        <td><input type="text" class="ally-notes"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button onclick="addAllyRow()">Add Ally</button>
+        </div>
+
+        <div class="section">
+            <h2>NOTES</h2>
+            <textarea id="notes" rows="6" placeholder="Character notes, backstory, goals, etc."></textarea>
+        </div>
+    </div>
+
+    <script>
+        // Skills data
+        const skills = [
+            { name: 'Acrobatics', stat: 'DEX' },
+            { name: 'Animal Handling', stat: 'WIS' },
+            { name: 'Arcana', stat: 'INT' },
+            { name: 'Athletics', stat: 'STR' },
+            { name: 'Deception', stat: 'CHA' },
+            { name: 'History', stat: 'INT' },
+            { name: 'Insight', stat: 'WIS' },
+            { name: 'Intimidation', stat: 'CHA' },
+            { name: 'Investigation', stat: 'INT' },
+            { name: 'Medicine', stat: 'WIS' },
+            { name: 'Nature', stat: 'INT' },
+            { name: 'Perception', stat: 'WIS' },
+            { name: 'Performance', stat: 'CHA' },
+            { name: 'Persuasion', stat: 'CHA' },
+            { name: 'Religion', stat: 'INT' },
+            { name: 'Sleight of Hand', stat: 'DEX' },
+            { name: 'Stealth', stat: 'DEX' },
+            { name: 'Survival', stat: 'WIS' }
+        ];
+
+        
+        // Initialize skills table
+        function initializeSkillsTable() {
+            const tbody = document.querySelector('#skillsTable tbody');
+            skills.forEach(skill => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${skill.name} (${skill.stat})</td>
+                    <td><input type="text" class="skill-modifier" placeholder="+X"></td>
+                    <td>
+                        <div class="proficiency-checkboxes">
+                            <label><input type="radio" name="prof-${skill.name}" value="none"> None</label>
+                            <label><input type="radio" name="prof-${skill.name}" value="prof"> Prof</label>
+                            <label><input type="radio" name="prof-${skill.name}" value="exp"> Exp</label>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Status tracker functionality
+        function initializeStatusTrackers() {
+            // Stress tracker
+            document.querySelectorAll('[data-stress]').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('[data-stress]').forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    updateStatModifiers();
+                });
+            });
+
+            // Infection tracker
+            document.querySelectorAll('[data-infection]').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('[data-infection]').forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    updateStatModifiers();
+                });
+            });
+
+            // Exhaustion tracker
+            document.querySelectorAll('[data-exhaustion]').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('[data-exhaustion]').forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    updateStatModifiers();
+                });
+            });
+        }
+
+        // Add profession row
+        function addProfessionRow() {
+            const tbody = document.querySelector('#professionsTable tbody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="profession-name"></td>
+                <td><input type="number" class="profession-level" min="0" max="6"></td>
+                <td><input type="number" class="profession-xp" min="0"></td>
+                <td><input type="number" class="profession-next" min="0"></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        // Add weapon row
+        function addWeaponRow() {
+            const tbody = document.querySelector('#weaponsTable tbody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="weapon-name"></td>
+                <td><input type="text" class="weapon-hit"></td>
+                <td><input type="text" class="weapon-damage"></td>
+                <td><input type="text" class="weapon-ammo"></td>
+                <td><input type="text" class="weapon-notes"></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        // Add equipment item
+        function addEquipmentItem() {
+            const equipmentList = document.getElementById('equipmentList');
+            const item = document.createElement('div');
+            item.className = 'equipment-item';
+            item.innerHTML = `
+                <input type="checkbox">
+                <input type="text" placeholder="Item name">
+            `;
+            equipmentList.appendChild(item);
+        }
+
+        // Add ally row
+        function addAllyRow() {
+            const tbody = document.querySelector('#alliesTable tbody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="ally-name"></td>
+                <td><input type="text" class="ally-location"></td>
+                <td><input type="text" class="ally-notes"></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        // Save character to localStorage
+        function saveCharacter() {
+            const characterData = {
+                name: document.getElementById('name').value,
+                age: document.getElementById('age').value,
+                gender: document.getElementById('gender').value,
+                background: document.getElementById('background').value,
+                startingProfession: document.getElementById('startingProfession').value,
+                currentProfessions: document.getElementById('currentProfessions').value,
+                stats: {
+                    str: document.getElementById('str').value,
+                    dex: document.getElementById('dex').value,
+                    con: document.getElementById('con').value,
+                    int: document.getElementById('int').value,
+                    wis: document.getElementById('wis').value,
+                    cha: document.getElementById('cha').value
+                },
+                hp: document.getElementById('hp').value,
+                ac: document.getElementById('ac').value,
+                speed: document.getElementById('speed').value,
+                initiative: document.getElementById('initiative').value,
+                proficiency: document.getElementById('proficiency').value,
+                stress: document.querySelector('[data-stress].active')?.dataset.stress || '0',
+                infection: document.querySelector('[data-infection].active')?.dataset.infection || 'clean',
+                exhaustion: document.querySelector('[data-exhaustion].active')?.dataset.exhaustion || '0',
+                savingThrows: {
+                    str: document.getElementById('saveStr').checked,
+                    dex: document.getElementById('saveDex').checked,
+                    con: document.getElementById('saveCon').checked,
+                    int: document.getElementById('saveInt').checked,
+                    wis: document.getElementById('saveWis').checked,
+                    cha: document.getElementById('saveCha').checked
+                },
+                skills: [],
+                professions: [],
+                weapons: [],
+                equipment: [],
+                allies: [],
+                equipmentSlots: {
+                    head: document.getElementById('head').value,
+                    neck: document.getElementById('neck').value,
+                    body: document.getElementById('body').value,
+                    back: document.getElementById('back').value,
+                    hands: document.getElementById('hands').value,
+                    waist: document.getElementById('waist').value,
+                    legs: document.getElementById('legs').value,
+                    feet: document.getElementById('feet').value
+                },
+                biteProtection: document.getElementById('biteProtection').value,
+                shield: document.getElementById('shield').value,
+                food: document.getElementById('food').value,
+                water: document.getElementById('water').value,
+                medicalSupplies: document.getElementById('medicalSupplies').value,
+                studyMaterials: document.getElementById('studyMaterials').value,
+                lifeHacks: document.getElementById('lifeHacks').value,
+                notes: document.getElementById('notes').value
+            };
+
+            // Save skills
+            skills.forEach(skill => {
+                const modifier = document.querySelector(`.skill-modifier`).value;
+                const proficiency = document.querySelector(`input[name="prof-${skill.name}"]:checked`)?.value || 'none';
+                characterData.skills.push({ name: skill.name, modifier, proficiency });
+            });
+
+            // Save professions
+            document.querySelectorAll('#professionsTable tbody tr').forEach(row => {
+                characterData.professions.push({
+                    name: row.querySelector('.profession-name').value,
+                    level: row.querySelector('.profession-level').value,
+                    xp: row.querySelector('.profession-xp').value,
+                    next: row.querySelector('.profession-next').value
+                });
+            });
+
+            // Save weapons
+            document.querySelectorAll('#weaponsTable tbody tr').forEach(row => {
+                characterData.weapons.push({
+                    name: row.querySelector('.weapon-name').value,
+                    hit: row.querySelector('.weapon-hit').value,
+                    damage: row.querySelector('.weapon-damage').value,
+                    ammo: row.querySelector('.weapon-ammo').value,
+                    notes: row.querySelector('.weapon-notes').value
+                });
+            });
+
+            // Save equipment
+            document.querySelectorAll('.equipment-item').forEach(item => {
+                characterData.equipment.push({
+                    checked: item.querySelector('input[type="checkbox"]').checked,
+                    name: item.querySelector('input[type="text"]').value
+                });
+            });
+
+            // Save allies
+            document.querySelectorAll('#alliesTable tbody tr').forEach(row => {
+                characterData.allies.push({
+                    name: row.querySelector('.ally-name').value,
+                    location: row.querySelector('.ally-location').value,
+                    notes: row.querySelector('.ally-notes').value
+                });
+            });
+
+            localStorage.setItem('zombieCharacter', JSON.stringify(characterData));
+            alert('Character saved successfully!');
+        }
+
+        // Load character from localStorage
+        function loadCharacter() {
+            const savedData = localStorage.getItem('zombieCharacter');
+            if (!savedData) {
+                alert('No saved character found!');
+                return;
+            }
+
+            const characterData = JSON.parse(savedData);
+
+            // Load basic info
+            document.getElementById('name').value = characterData.name || '';
+            document.getElementById('age').value = characterData.age || '';
+            document.getElementById('gender').value = characterData.gender || '';
+            document.getElementById('background').value = characterData.background || '';
+            document.getElementById('startingProfession').value = characterData.startingProfession || '';
+            document.getElementById('currentProfessions').value = characterData.currentProfessions || '';
+
+            // Load stats
+            if (characterData.stats) {
+                document.getElementById('str').value = characterData.stats.str || '';
+                document.getElementById('dex').value = characterData.stats.dex || '';
+                document.getElementById('con').value = characterData.stats.con || '';
+                document.getElementById('int').value = characterData.stats.int || '';
+                document.getElementById('wis').value = characterData.stats.wis || '';
+                document.getElementById('cha').value = characterData.stats.cha || '';
+            }
+
+            // Load combat stats
+            document.getElementById('hp').value = characterData.hp || '';
+            document.getElementById('ac').value = characterData.ac || '';
+            document.getElementById('speed').value = characterData.speed || '';
+            document.getElementById('initiative').value = characterData.initiative || '';
+            document.getElementById('proficiency').value = characterData.proficiency || '';
+
+            
+            // Load status trackers
+            if (characterData.stress) {
+                document.querySelector(`[data-stress="${characterData.stress}"]`)?.classList.add('active');
+            }
+            if (characterData.infection) {
+                document.querySelector(`[data-infection="${characterData.infection}"]`)?.classList.add('active');
+            }
+            if (characterData.exhaustion) {
+                document.querySelector(`[data-exhaustion="${characterData.exhaustion}"]`)?.classList.add('active');
+            }
+
+            // Load saving throws
+            if (characterData.savingThrows) {
+                document.getElementById('saveStr').checked = characterData.savingThrows.str || false;
+                document.getElementById('saveDex').checked = characterData.savingThrows.dex || false;
+                document.getElementById('saveCon').checked = characterData.savingThrows.con || false;
+                document.getElementById('saveInt').checked = characterData.savingThrows.int || false;
+                document.getElementById('saveWis').checked = characterData.savingThrows.wis || false;
+                document.getElementById('saveCha').checked = characterData.savingThrows.cha || false;
+            }
+
+            // Load equipment slots
+            if (characterData.equipmentSlots) {
+                document.getElementById('head').value = characterData.equipmentSlots.head || '';
+                document.getElementById('neck').value = characterData.equipmentSlots.neck || '';
+                document.getElementById('body').value = characterData.equipmentSlots.body || '';
+                document.getElementById('back').value = characterData.equipmentSlots.back || '';
+                document.getElementById('hands').value = characterData.equipmentSlots.hands || '';
+                document.getElementById('waist').value = characterData.equipmentSlots.waist || '';
+                document.getElementById('legs').value = characterData.equipmentSlots.legs || '';
+                document.getElementById('feet').value = characterData.equipmentSlots.feet || '';
+            }
+            
+            // Load other fields
+            document.getElementById('biteProtection').value = characterData.biteProtection || '';
+            document.getElementById('shield').value = characterData.shield || '';
+            document.getElementById('food').value = characterData.food || '';
+            document.getElementById('water').value = characterData.water || '';
+            document.getElementById('medicalSupplies').value = characterData.medicalSupplies || '';
+            document.getElementById('studyMaterials').value = characterData.studyMaterials || '';
+            document.getElementById('lifeHacks').value = characterData.lifeHacks || '';
+            document.getElementById('notes').value = characterData.notes || '';
+
+            updateStatModifiers(); // Recalculate modifiers after loading
+            alert('Character loaded successfully!');
+        }
+
+        // Export character to JSON file
+        function exportCharacter() {
+            const characterData = {
+                name: document.getElementById('name').value,
+                age: document.getElementById('age').value,
+                gender: document.getElementById('gender').value,
+                background: document.getElementById('background').value,
+                startingProfession: document.getElementById('startingProfession').value,
+                currentProfessions: document.getElementById('currentProfessions').value,
+                stats: {
+                    str: document.getElementById('str').value,
+                    dex: document.getElementById('dex').value,
+                    con: document.getElementById('con').value,
+                    int: document.getElementById('int').value,
+                    wis: document.getElementById('wis').value,
+                    cha: document.getElementById('cha').value
+                },
+                hp: document.getElementById('hp').value,
+                ac: document.getElementById('ac').value,
+                speed: document.getElementById('speed').value,
+                initiative: document.getElementById('initiative').value,
+                proficiency: document.getElementById('proficiency').value,
+                stress: document.querySelector('[data-stress].active')?.dataset.stress || '0',
+                infection: document.querySelector('[data-infection].active')?.dataset.infection || 'clean',
+                exhaustion: document.querySelector('[data-exhaustion].active')?.dataset.exhaustion || '0',
+                savingThrows: {
+                    str: document.getElementById('saveStr').checked,
+                    dex: document.getElementById('saveDex').checked,
+                    con: document.getElementById('saveCon').checked,
+                    int: document.getElementById('saveInt').checked,
+                    wis: document.getElementById('saveWis').checked,
+                    cha: document.getElementById('saveCha').checked
+                },
+                skills: [],
+                professions: [],
+                weapons: [],
+                equipment: [],
+                allies: [],
+                equipmentSlots: {
+                    head: document.getElementById('head').value,
+                    neck: document.getElementById('neck').value,
+                    body: document.getElementById('body').value,
+                    back: document.getElementById('back').value,
+                    hands: document.getElementById('hands').value,
+                    waist: document.getElementById('waist').value,
+                    legs: document.getElementById('legs').value,
+                    feet: document.getElementById('feet').value
+                },
+                biteProtection: document.getElementById('biteProtection').value,
+                shield: document.getElementById('shield').value,
+                food: document.getElementById('food').value,
+                water: document.getElementById('water').value,
+                medicalSupplies: document.getElementById('medicalSupplies').value,
+                studyMaterials: document.getElementById('studyMaterials').value,
+                lifeHacks: document.getElementById('lifeHacks').value,
+                notes: document.getElementById('notes').value,
+                exportDate: new Date().toISOString(),
+                version: "1.0"
+            };
+
+            // Save skills
+            skills.forEach(skill => {
+                const modifier = document.querySelector(`.skill-modifier`).value;
+                const proficiency = document.querySelector(`input[name="prof-${skill.name}"]:checked`)?.value || 'none';
+                characterData.skills.push({ name: skill.name, modifier, proficiency });
+            });
+
+            // Save professions
+            document.querySelectorAll('#professionsTable tbody tr').forEach(row => {
+                characterData.professions.push({
+                    name: row.querySelector('.profession-name').value,
+                    level: row.querySelector('.profession-level').value,
+                    xp: row.querySelector('.profession-xp').value,
+                    next: row.querySelector('.profession-next').value
+                });
+            });
+
+            // Save weapons
+            document.querySelectorAll('#weaponsTable tbody tr').forEach(row => {
+                characterData.weapons.push({
+                    name: row.querySelector('.weapon-name').value,
+                    hit: row.querySelector('.weapon-hit').value,
+                    damage: row.querySelector('.weapon-damage').value,
+                    ammo: row.querySelector('.weapon-ammo').value,
+                    notes: row.querySelector('.weapon-notes').value
+                });
+            });
+
+            // Save allies
+            document.querySelectorAll('#alliesTable tbody tr').forEach(row => {
+                characterData.allies.push({
+                    name: row.querySelector('.ally-name').value,
+                    location: row.querySelector('.ally-location').value,
+                    notes: row.querySelector('.ally-notes').value
+                });
+            });
+
+            // Create and download JSON file
+            const dataStr = JSON.stringify(characterData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${characterData.name || 'Character'}_DeadWorld.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            alert('Character exported successfully!');
+        }
+
+        // Import character from JSON file
+        function importCharacter(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const characterData = JSON.parse(e.target.result);
+                    
+                    // Validate character data
+                    if (!characterData.version) {
+                        throw new Error('Invalid character file format');
+                    }
+
+                    // Load basic info
+                    document.getElementById('name').value = characterData.name || '';
+                    document.getElementById('age').value = characterData.age || '';
+                    document.getElementById('gender').value = characterData.gender || '';
+                    document.getElementById('background').value = characterData.background || '';
+                    document.getElementById('startingProfession').value = characterData.startingProfession || '';
+                    document.getElementById('currentProfessions').value = characterData.currentProfessions || '';
+
+                    // Load stats
+                    if (characterData.stats) {
+                        document.getElementById('str').value = characterData.stats.str || '';
+                        document.getElementById('dex').value = characterData.stats.dex || '';
+                        document.getElementById('con').value = characterData.stats.con || '';
+                        document.getElementById('int').value = characterData.stats.int || '';
+                        document.getElementById('wis').value = characterData.stats.wis || '';
+                        document.getElementById('cha').value = characterData.stats.cha || '';
+                    }
+
+                    // Load combat stats
+                    document.getElementById('hp').value = characterData.hp || '';
+                    document.getElementById('ac').value = characterData.ac || '';
+                    document.getElementById('speed').value = characterData.speed || '';
+                    document.getElementById('initiative').value = characterData.initiative || '';
+                    document.getElementById('proficiency').value = characterData.proficiency || '';
+
+                    // Load status trackers
+                    if (characterData.stress) {
+                        document.querySelector(`[data-stress="${characterData.stress}"]`)?.classList.add('active');
+                    }
+                    if (characterData.infection) {
+                        document.querySelector(`[data-infection="${characterData.infection}"]`)?.classList.add('active');
+                    }
+                    if (characterData.exhaustion) {
+                        document.querySelector(`[data-exhaustion="${characterData.exhaustion}"]`)?.classList.add('active');
+                    }
+
+                    // Load saving throws
+                    if (characterData.savingThrows) {
+                        document.getElementById('saveStr').checked = characterData.savingThrows.str || false;
+                        document.getElementById('saveDex').checked = characterData.savingThrows.dex || false;
+                        document.getElementById('saveCon').checked = characterData.savingThrows.con || false;
+                        document.getElementById('saveInt').checked = characterData.savingThrows.int || false;
+                        document.getElementById('saveWis').checked = characterData.savingThrows.wis || false;
+                        document.getElementById('saveCha').checked = characterData.savingThrows.cha || false;
+                    }
+
+                    // Load equipment slots
+                    if (characterData.equipmentSlots) {
+                        document.getElementById('head').value = characterData.equipmentSlots.head || '';
+                        document.getElementById('neck').value = characterData.equipmentSlots.neck || '';
+                        document.getElementById('body').value = characterData.equipmentSlots.body || '';
+                        document.getElementById('back').value = characterData.equipmentSlots.back || '';
+                        document.getElementById('hands').value = characterData.equipmentSlots.hands || '';
+                        document.getElementById('waist').value = characterData.equipmentSlots.waist || '';
+                        document.getElementById('legs').value = characterData.equipmentSlots.legs || '';
+                        document.getElementById('feet').value = characterData.equipmentSlots.feet || '';
+                    }
+
+                    // Load other fields
+                    document.getElementById('biteProtection').value = characterData.biteProtection || '';
+                    document.getElementById('shield').value = characterData.shield || '';
+                    document.getElementById('food').value = characterData.food || '';
+                    document.getElementById('water').value = characterData.water || '';
+                    document.getElementById('medicalSupplies').value = characterData.medicalSupplies || '';
+                    document.getElementById('studyMaterials').value = characterData.studyMaterials || '';
+                    document.getElementById('lifeHacks').value = characterData.lifeHacks || '';
+                    document.getElementById('notes').value = characterData.notes || '';
+
+                    // Clear and reload professions table
+                    const profTbody = document.querySelector('#professionsTable tbody');
+                    profTbody.innerHTML = '';
+                    if (characterData.professions && characterData.professions.length > 0) {
+                        characterData.professions.forEach(prof => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td><input type="text" class="profession-name" value="${prof.name || ''}"></td>
+                                <td><input type="number" class="profession-level" min="0" max="6" value="${prof.level || ''}"></td>
+                                <td><input type="number" class="profession-xp" min="0" value="${prof.xp || ''}"></td>
+                                <td><input type="number" class="profession-next" min="0" value="${prof.next || ''}"></td>
+                            `;
+                            profTbody.appendChild(row);
+                        });
+                    } else {
+                        addProfessionRow(); // Add empty row if no professions
+                    }
+
+                    // Clear and reload weapons table
+                    const weapTbody = document.querySelector('#weaponsTable tbody');
+                    weapTbody.innerHTML = '';
+                    if (characterData.weapons && characterData.weapons.length > 0) {
+                        characterData.weapons.forEach(weapon => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td><input type="text" class="weapon-name" value="${weapon.name || ''}"></td>
+                                <td><input type="text" class="weapon-hit" value="${weapon.hit || ''}"></td>
+                                <td><input type="text" class="weapon-damage" value="${weapon.damage || ''}"></td>
+                                <td><input type="text" class="weapon-ammo" value="${weapon.ammo || ''}"></td>
+                                <td><input type="text" class="weapon-notes" value="${weapon.notes || ''}"></td>
+                            `;
+                            weapTbody.appendChild(row);
+                        });
+                    } else {
+                        addWeaponRow(); // Add empty row if no weapons
+                    }
+
+                    // Clear and reload allies table
+                    const alliesTbody = document.querySelector('#alliesTable tbody');
+                    alliesTbody.innerHTML = '';
+                    if (characterData.allies && characterData.allies.length > 0) {
+                        characterData.allies.forEach(ally => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td><input type="text" class="ally-name" value="${ally.name || ''}"></td>
+                                <td><input type="text" class="ally-location" value="${ally.location || ''}"></td>
+                                <td><input type="text" class="ally-notes" value="${ally.notes || ''}"></td>
+                            `;
+                            alliesTbody.appendChild(row);
+                        });
+                    } else {
+                        addAllyRow(); // Add empty row if no allies
+                    }
+
+                    updateStatModifiers(); // Recalculate modifiers after loading
+                    alert(`Character "${characterData.name || 'Unknown'}" imported successfully!`);
+                    
+                } catch (error) {
+                    alert('Error importing character: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset file input
+            event.target.value = '';
+        }
+
+        // Clear all fields
+        function clearCharacter() {
+            if (confirm('Are you sure you want to clear all character data?')) {
+                document.querySelectorAll('input, textarea, select').forEach(element => {
+                    if (element.type === 'checkbox' || element.type === 'radio') {
+                        element.checked = false;
+                    } else {
+                        element.value = '';
+                    }
+                });
+                document.querySelectorAll('.tracker-option').forEach(opt => opt.classList.remove('active'));
+            }
+        }
+
+        // Calculate D&D 5e stat modifier
+        function getStatModifier(stat) {
+            stat = parseInt(stat) || 10;
+            return Math.floor((stat - 10) / 2);
+        }
+
+        // Get status disadvantage penalty
+        function getStatusDisadvantage() {
+            let penalty = 0;
+            
+            // Stress disadvantage
+            const stress = document.querySelector('[data-stress].active')?.dataset.stress || '0';
+            if (parseInt(stress) >= 3) penalty -= 1;
+            if (parseInt(stress) >= 5) penalty -= 1;
+            
+            // Infection disadvantage
+            const infection = document.querySelector('[data-infection].active')?.dataset.infection || 'clean';
+            if (infection === 'infected') penalty -= 1;
+            if (infection === 's1') penalty -= 1;
+            if (infection === 's2') penalty -= 1;
+            if (infection === 's3') penalty -= 2;
+            if (infection === 's4') penalty -= 3;
+            
+            // Exhaustion disadvantage
+            const exhaustion = document.querySelector('[data-exhaustion].active')?.dataset.exhaustion || '0';
+            if (parseInt(exhaustion) >= 1) penalty -= 1;
+            if (parseInt(exhaustion) >= 3) penalty -= 1;
+            if (parseInt(exhaustion) >= 5) penalty -= 2;
+            
+            return penalty;
+        }
+
+        // Update all stat modifiers and saving throws
+        function updateStatModifiers() {
+            const proficiency = parseInt(document.getElementById('proficiency').value) || 0;
+            const disadvantage = getStatusDisadvantage();
+            
+            // Update stat modifiers
+            const stats = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+            stats.forEach(stat => {
+                const statValue = document.getElementById(stat).value;
+                const modifier = getStatModifier(statValue) + disadvantage;
+                document.getElementById(stat + 'Mod').textContent = (modifier >= 0 ? '+' : '') + modifier;
+            });
+            
+            // Update saving throws
+            stats.forEach(stat => {
+                const statValue = document.getElementById(stat).value;
+                const baseModifier = getStatModifier(statValue);
+                const totalModifier = baseModifier + disadvantage;
+                document.getElementById(stat + 'Save').textContent = (totalModifier >= 0 ? '+' : '') + totalModifier;
+            });
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSkillsTable();
+            initializeStatusTrackers();
+            updateStatModifiers(); // Initial calculation
+        });
+    </script>
+</body>
+</html>
