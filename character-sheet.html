@@ -3,24 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dead World Character Sheet</title>
-    
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#2a2a2a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Dead World">
-    <meta name="application-name" content="Dead World">
-    <meta name="msapplication-TileColor" content="#2a2a2a">
-    <meta name="msapplication-config" content="browserconfig.xml">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- Apple Touch Icons -->
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
+    <title>Zombie Apocalypse Character Sheet</title>
     <style>
         * {
             box-sizing: border-box;
@@ -1266,19 +1249,6 @@
                 const baseModifier = getStatModifier(statValue);
                 const totalModifier = baseModifier + disadvantage;
                 document.getElementById(stat + 'Save').textContent = (totalModifier >= 0 ? '+' : '') + totalModifier;
-            });
-        }
-
-        // Register Service Worker for PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(function(registration) {
-                        console.log('ServiceWorker registration successful');
-                    })
-                    .catch(function(error) {
-                        console.log('ServiceWorker registration failed');
-                    });
             });
         }
 
