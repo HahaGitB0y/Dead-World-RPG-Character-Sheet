@@ -471,11 +471,11 @@
         <h1>DEAD WORLD CHARACTER SHEET</h1>
         
         <div class="button-group">
-            <button onclick="saveCharacterToFile()">💾 Save Character</button>
-            <button onclick="document.getElementById('loadFile').click()">📁 Load Character</button>
-            <button onclick="saveToLocal()">📱 Save to Device</button>
-            <button onclick="loadFromLocal()">📱 Load from Device</button>
-            <button onclick="clearCharacter()">🗑️ Clear All</button>
+            <button id="saveButton">💾 Save Character</button>
+            <button id="loadFileButton">📁 Load Character</button>
+            <button id="saveDeviceButton">📱 Save to Device</button>
+            <button id="loadDeviceButton">📱 Load from Device</button>
+            <button id="clearButton">🗑️ Clear All</button>
             <input type="file" id="loadFile" accept=".json" style="display: none;" onchange="loadCharacterFromFile(event)">
         </div>
 
@@ -2811,6 +2811,15 @@
             initializeStatusTrackers();
             updateStatModifiers(); // Initial calculation
             updateWeaponStats(); // Initial weapon calculation
+            
+            // Add event listeners to buttons
+            document.getElementById('saveButton').addEventListener('click', saveCharacterToFile);
+            document.getElementById('loadFileButton').addEventListener('click', function() {
+                document.getElementById('loadFile').click();
+            });
+            document.getElementById('saveDeviceButton').addEventListener('click', saveToLocal);
+            document.getElementById('loadDeviceButton').addEventListener('click', loadFromLocal);
+            document.getElementById('clearButton').addEventListener('click', clearCharacter);
             
             // Load saved data on startup
             loadCharacter();
