@@ -213,6 +213,111 @@
             font-weight: bold;
         }
         
+        /* Professions table layout */
+        #professionsTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        #professionsTable th:nth-child(1) {
+            width: 60%; /* Profession name - expanded to fill space */
+        }
+        
+        #professionsTable th:nth-child(2) {
+            width: 12%; /* Level */
+        }
+        
+        #professionsTable th:nth-child(3) {
+            width: 13%; /* XP - smaller than level */
+        }
+        
+        #professionsTable th:nth-child(4) {
+            width: 15%; /* Next level - smaller than level */
+        }
+        
+        #professionsTable td {
+            padding: 5px;
+        }
+        
+        #professionsTable input {
+            width: 100%;
+            padding: 5px;
+            background: #1a202c;
+            border: 1px solid #4a5568;
+            border-radius: 4px;
+            color: #f7fafc;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        #professionsTable input:focus {
+            outline: none;
+            border-color: #4ecdc4;
+        }
+        
+        /* Skills table layout */
+        #skillsTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        #skillsTable th:nth-child(1) {
+            width: 30%; /* Skill name */
+        }
+        
+        #skillsTable th:nth-child(2) {
+            width: 15%; /* Modifier */
+        }
+        
+        #skillsTable th:nth-child(3) {
+            width: 20%; /* Proficiency */
+        }
+        
+        #skillsTable th:nth-child(4) {
+            width: 10%; /* Level */
+        }
+        
+        #skillsTable th:nth-child(5) {
+            width: 12.5%; /* XP - smaller than level */
+        }
+        
+        #skillsTable th:nth-child(6) {
+            width: 12.5%; /* Next level - smaller than level */
+        }
+        
+        #skillsTable td {
+            padding: 5px;
+        }
+        
+        #skillsTable input {
+            width: 100%;
+            padding: 5px;
+            background: #1a202c;
+            border: 1px solid #4a5568;
+            border-radius: 4px;
+            color: #f7fafc;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        #skillsTable input:focus {
+            outline: none;
+            border-color: #4ecdc4;
+        }
+        
+        #skillsTable select {
+            width: 100%;
+            padding: 5px;
+            background: #1a202c;
+            border: 1px solid #4a5568;
+            border-radius: 4px;
+            color: #f7fafc;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
         .proficiency-checkboxes {
             display: flex;
             gap: 5px;
@@ -996,6 +1101,9 @@
                         <th>SKILL</th>
                         <th>MODIFIER</th>
                         <th>PROFICIENCY</th>
+                        <th>LEVEL</th>
+                        <th>XP</th>
+                        <th>NEXT LEVEL</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1341,6 +1449,9 @@
                             <label><input type="radio" name="prof-${skill.name}" value="exp"> Exp</label>
                         </div>
                     </td>
+                    <td><input type="number" class="skill-level" min="0" max="6" placeholder="0"></td>
+                    <td><input type="number" class="skill-xp" min="0" placeholder="0"></td>
+                    <td><input type="number" class="skill-next" min="0" placeholder="0"></td>
                 `;
                 tbody.appendChild(row);
             });
