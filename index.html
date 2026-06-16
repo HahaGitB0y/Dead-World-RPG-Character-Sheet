@@ -286,6 +286,90 @@
             color: #4ecdc4;
         }
         
+        .weapons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .weapon-block {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            border: 2px solid #718096;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .weapon-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+        }
+        
+        .weapon-header {
+            font-size: 16px;
+            font-weight: bold;
+            color: #4ecdc4;
+            margin-bottom: 10px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .weapon-field {
+            margin-bottom: 8px;
+        }
+        
+        .weapon-field label {
+            display: block;
+            font-size: 12px;
+            color: #a0aec0;
+            margin-bottom: 3px;
+            font-weight: bold;
+        }
+        
+        .weapon-field input {
+            width: 100%;
+            padding: 8px;
+            background: #1a202c;
+            border: 1px solid #4a5568;
+            border-radius: 4px;
+            color: #f7fafc;
+            font-size: 14px;
+        }
+        
+        .weapon-field input:focus {
+            outline: none;
+            border-color: #4ecdc4;
+            box-shadow: 0 0 0 2px rgba(78, 205, 196, 0.2);
+        }
+        
+        .remove-weapon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            padding: 0;
+        }
+        
+        .remove-weapon:hover {
+            background: #c53030;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -635,27 +719,33 @@
                 <button onclick="addCreatedWeapon()">Add Weapon to Sheet</button>
             </div>
             
-            <table id="weaponsTable">
-                <thead>
-                    <tr>
-                        <th>WEAPON</th>
-                        <th>+HIT</th>
-                        <th>DAMAGE</th>
-                        <th>AMMO</th>
-                        <th>NOTES</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><input type="text" class="weapon-name"></td>
-                        <td><input type="text" class="weapon-hit"></td>
-                        <td><input type="text" class="weapon-damage"></td>
-                        <td><input type="text" class="weapon-ammo"></td>
-                        <td><input type="text" class="weapon-notes"></td>
-                    </tr>
-                </tbody>
-            </table>
-            <button onclick="addWeaponRow()">Add Custom Weapon</button>
+            <div class="weapons-container" id="weaponsContainer">
+                <div class="weapon-block">
+                    <button class="remove-weapon" onclick="removeWeapon(this)">×</button>
+                    <div class="weapon-header">Weapon 1</div>
+                    <div class="weapon-field">
+                        <label>WEAPON NAME</label>
+                        <input type="text" class="weapon-name" placeholder="Enter weapon name">
+                    </div>
+                    <div class="weapon-field">
+                        <label>+HIT</label>
+                        <input type="text" class="weapon-hit" placeholder="+0">
+                    </div>
+                    <div class="weapon-field">
+                        <label>DAMAGE</label>
+                        <input type="text" class="weapon-damage" placeholder="1d6+0">
+                    </div>
+                    <div class="weapon-field">
+                        <label>AMMO</label>
+                        <input type="text" class="weapon-ammo" placeholder="Current/Max">
+                    </div>
+                    <div class="weapon-field">
+                        <label>NOTES</label>
+                        <input type="text" class="weapon-notes" placeholder="Special properties">
+                    </div>
+                </div>
+            </div>
+            <button onclick="addWeaponBlock()">Add Weapon Block</button>
         </div>
 
         <div class="section">
@@ -1445,22 +1535,77 @@
             const fullDamage = damageDie + damageBonus;
             const notes = `${damageType} ${document.getElementById('weaponStat').value.toUpperCase()}`;
             
-            // Add to weapons table
-            const tbody = document.querySelector('#weaponsTable tbody');
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><input type="text" class="weapon-name" value="${weaponName}"></td>
-                <td><input type="text" class="weapon-hit" value="${hitBonus}"></td>
-                <td><input type="text" class="weapon-damage" value="${fullDamage}"></td>
-                <td><input type="text" class="weapon-ammo"></td>
-                <td><input type="text" class="weapon-notes" value="${notes}"></td>
+            // Add to weapons container
+            const container = document.getElementById('weaponsContainer');
+            const weaponCount = container.children.length + 1;
+            const block = document.createElement('div');
+            block.className = 'weapon-block';
+            block.innerHTML = `
+                <button class="remove-weapon" onclick="removeWeapon(this)">×</button>
+                <div class="weapon-header">${weaponName}</div>
+                <div class="weapon-field">
+                    <label>WEAPON NAME</label>
+                    <input type="text" class="weapon-name" value="${weaponName}">
+                </div>
+                <div class="weapon-field">
+                    <label>+HIT</label>
+                    <input type="text" class="weapon-hit" value="${hitBonus}">
+                </div>
+                <div class="weapon-field">
+                    <label>DAMAGE</label>
+                    <input type="text" class="weapon-damage" value="${fullDamage}">
+                </div>
+                <div class="weapon-field">
+                    <label>AMMO</label>
+                    <input type="text" class="weapon-ammo" placeholder="Current/Max">
+                </div>
+                <div class="weapon-field">
+                    <label>NOTES</label>
+                    <input type="text" class="weapon-notes" value="${notes}">
+                </div>
             `;
-            tbody.appendChild(row);
+            container.appendChild(block);
             
             // Clear form
             document.getElementById('weaponName').value = '';
             document.getElementById('weaponType').value = '';
             updateWeaponStats();
+        }
+        
+        function addWeaponBlock() {
+            const container = document.getElementById('weaponsContainer');
+            const weaponCount = container.children.length + 1;
+            const block = document.createElement('div');
+            block.className = 'weapon-block';
+            block.innerHTML = `
+                <button class="remove-weapon" onclick="removeWeapon(this)">×</button>
+                <div class="weapon-header">Weapon ${weaponCount}</div>
+                <div class="weapon-field">
+                    <label>WEAPON NAME</label>
+                    <input type="text" class="weapon-name" placeholder="Enter weapon name">
+                </div>
+                <div class="weapon-field">
+                    <label>+HIT</label>
+                    <input type="text" class="weapon-hit" placeholder="+0">
+                </div>
+                <div class="weapon-field">
+                    <label>DAMAGE</label>
+                    <input type="text" class="weapon-damage" placeholder="1d6+0">
+                </div>
+                <div class="weapon-field">
+                    <label>AMMO</label>
+                    <input type="text" class="weapon-ammo" placeholder="Current/Max">
+                </div>
+                <div class="weapon-field">
+                    <label>NOTES</label>
+                    <input type="text" class="weapon-notes" placeholder="Special properties">
+                </div>
+            `;
+            container.appendChild(block);
+        }
+        
+        function removeWeapon(button) {
+            button.parentElement.remove();
         }
 
         // Initialize everything when page loads
