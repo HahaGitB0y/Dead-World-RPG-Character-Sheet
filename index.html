@@ -471,13 +471,78 @@
         <h1>DEAD WORLD CHARACTER SHEET</h1>
         
         <div class="button-group">
-            <button id="saveButton">💾 Save Character</button>
-            <button id="loadFileButton">📁 Load Character</button>
-            <button id="saveDeviceButton">📱 Save to Device</button>
-            <button id="loadDeviceButton">📱 Load from Device</button>
-            <button id="clearButton">🗑️ Clear All</button>
+            <button ontouchstart="handleSave()" onclick="handleSave()">💾 Save Character</button>
+            <button ontouchstart="document.getElementById('loadFile').click()" onclick="document.getElementById('loadFile').click()">📁 Load Character</button>
+            <button ontouchstart="handleSaveDevice()" onclick="handleSaveDevice()">📱 Save to Device</button>
+            <button ontouchstart="handleLoadDevice()" onclick="handleLoadDevice()">📱 Load from Device</button>
+            <button ontouchstart="handleClear()" onclick="handleClear()">🗑️ Clear All</button>
             <input type="file" id="loadFile" accept=".json" style="display: none;" onchange="loadCharacterFromFile(event)">
         </div>
+        
+        <script>
+            // Inline script functions that work in iOS PWA
+            function handleSave() {
+                alert('Save button clicked! JavaScript is working.');
+                try {
+                    const name = document.getElementById('name').value || 'Test Character';
+                    const testData = {
+                        name: name,
+                        hp: document.getElementById('hp').value || '10',
+                        ac: document.getElementById('ac').value || '10',
+                        test: 'This is a test save',
+                        timestamp: new Date().toISOString()
+                    };
+                    localStorage.setItem('deadWorldCharacterTest', JSON.stringify(testData));
+                    alert('Character saved to device storage!\n\nName: ' + testData.name + '\nHP: ' + testData.hp + '\nAC: ' + testData.ac);
+                } catch (error) {
+                    alert('localStorage not available: ' + error.message);
+                }
+            }
+            
+            function handleSaveDevice() {
+                try {
+                    const name = document.getElementById('name').value || 'Test Character';
+                    const characterData = {
+                        name: name,
+                        hp: document.getElementById('hp').value || '10',
+                        ac: document.getElementById('ac').value || '10',
+                        timestamp: new Date().toISOString()
+                    };
+                    localStorage.setItem('deadWorldCharacter', JSON.stringify(characterData));
+                    alert('Character saved to device storage!\n\nName: ' + characterData.name + '\nHP: ' + characterData.hp + '\nAC: ' + characterData.ac);
+                } catch (error) {
+                    alert('Device storage not available: ' + error.message);
+                }
+            }
+            
+            function handleLoadDevice() {
+                try {
+                    const savedData = localStorage.getItem('deadWorldCharacter');
+                    if (!savedData) {
+                        alert('No saved character found on device.');
+                        return;
+                    }
+                    const characterData = JSON.parse(savedData);
+                    document.getElementById('name').value = characterData.name || '';
+                    document.getElementById('hp').value = characterData.hp || '';
+                    document.getElementById('ac').value = characterData.ac || '';
+                    alert('Character loaded successfully!\n\nName: ' + characterData.name + '\nHP: ' + characterData.hp + '\nAC: ' + characterData.ac);
+                } catch (error) {
+                    alert('Error loading character: ' + error.message);
+                }
+            }
+            
+            function handleClear() {
+                if (confirm('Are you sure you want to clear all character data?')) {
+                    document.querySelectorAll('input, textarea').forEach(input => {
+                        if (input.type !== 'file') {
+                            input.value = '';
+                        }
+                    });
+                    alert('All data cleared!');
+                }
+            }
+        </script>
 
         <div class="section">
             <h2>CHARACTER INFO</h2>
@@ -2811,15 +2876,6 @@
             initializeStatusTrackers();
             updateStatModifiers(); // Initial calculation
             updateWeaponStats(); // Initial weapon calculation
-            
-            // Add event listeners to buttons
-            document.getElementById('saveButton').addEventListener('click', saveCharacterToFile);
-            document.getElementById('loadFileButton').addEventListener('click', function() {
-                document.getElementById('loadFile').click();
-            });
-            document.getElementById('saveDeviceButton').addEventListener('click', saveToLocal);
-            document.getElementById('loadDeviceButton').addEventListener('click', loadFromLocal);
-            document.getElementById('clearButton').addEventListener('click', clearCharacter);
             
             // Load saved data on startup
             loadCharacter();
