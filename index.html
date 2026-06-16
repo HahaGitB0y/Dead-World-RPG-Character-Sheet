@@ -263,6 +263,29 @@
             border-radius: 3px;
         }
         
+        .weapon-creator {
+            background: #3a3a3a;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #555;
+        }
+        
+        .weapon-stats-display {
+            display: flex;
+            gap: 15px;
+            margin: 10px 0;
+            padding: 10px;
+            background: #444;
+            border-radius: 3px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-display {
+            font-size: 14px;
+            color: #4ecdc4;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -535,6 +558,83 @@
 
         <div class="section">
             <h2>WEAPONS</h2>
+            <div class="weapon-creator">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="weaponType">WEAPON TYPE:</label>
+                        <select id="weaponType" onchange="updateWeaponStats()">
+                            <option value="">Select weapon...</option>
+                            <option value="melee-light">Light Melee (Dagger, Club)</option>
+                            <option value="melee-simple">Simple Melee (Staff, Mace)</option>
+                            <option value="melee-martial">Martial Melee (Sword, Axe)</option>
+                            <option value="melee-heavy">Heavy Melee (Greatsword, Maul)</option>
+                            <option value="ranged-light">Light Ranged (Sling, Pistol)</option>
+                            <option value="ranged-simple">Simple Ranged (Shortbow)</option>
+                            <option value="ranged-martial">Martial Ranged (Longbow, Rifle)</option>
+                            <option value="ranged-heavy">Heavy Ranged (Shotgun, Sniper)</option>
+                            <option value="custom">Custom Weapon</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="weaponStat">ATTACK STAT:</label>
+                        <select id="weaponStat" onchange="updateWeaponStats()">
+                            <option value="str">STR</option>
+                            <option value="dex">DEX</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="weaponProficiency">PROFICIENCY:</label>
+                        <select id="weaponProficiency" onchange="updateWeaponStats()">
+                            <option value="0">None</option>
+                            <option value="2">+2 Proficient</option>
+                            <option value="3">+3 Expert</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="weaponName">WEAPON NAME:</label>
+                        <input type="text" id="weaponName" placeholder="Custom weapon name">
+                    </div>
+                    <div class="form-group">
+                        <label for="weaponDamageDie">DAMAGE DIE:</label>
+                        <select id="weaponDamageDie" onchange="updateWeaponStats()">
+                            <option value="d4">d4</option>
+                            <option value="d6">d6</option>
+                            <option value="d8">d8</option>
+                            <option value="d10">d10</option>
+                            <option value="d12">d12</option>
+                            <option value="2d6">2d6</option>
+                            <option value="2d8">2d8</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="weaponDamageType">DAMAGE TYPE:</label>
+                        <select id="weaponDamageType">
+                            <option value="Slashing">Slashing</option>
+                            <option value="Piercing">Piercing</option>
+                            <option value="Bludgeoning">Bludgeoning</option>
+                            <option value="Fire">Fire</option>
+                            <option value="Acid">Acid</option>
+                            <option value="Cold">Cold</option>
+                            <option value="Lightning">Lightning</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="weapon-stats-display">
+                    <div class="stat-display">
+                        <strong>TO HIT BONUS:</strong> <span id="calculatedHitBonus">+0</span>
+                    </div>
+                    <div class="stat-display">
+                        <strong>DAMAGE BONUS:</strong> <span id="calculatedDamageBonus">+0</span>
+                    </div>
+                    <div class="stat-display">
+                        <strong>FULL DAMAGE:</strong> <span id="fullDamage">1d6+0</span>
+                    </div>
+                </div>
+                <button onclick="addCreatedWeapon()">Add Weapon to Sheet</button>
+            </div>
+            
             <table id="weaponsTable">
                 <thead>
                     <tr>
@@ -555,7 +655,7 @@
                     </tr>
                 </tbody>
             </table>
-            <button onclick="addWeaponRow()">Add Weapon</button>
+            <button onclick="addWeaponRow()">Add Custom Weapon</button>
         </div>
 
         <div class="section">
@@ -1309,11 +1409,66 @@
             });
         }
 
+        // Weapon stat calculation functions
+        function updateWeaponStats() {
+            const weaponType = document.getElementById('weaponType').value;
+            const weaponStat = document.getElementById('weaponStat').value;
+            const proficiency = parseInt(document.getElementById('weaponProficiency').value) || 0;
+            const damageDie = document.getElementById('weaponDamageDie').value;
+            
+            // Get character stat modifier
+            const statValue = document.getElementById(weaponStat).value || 10;
+            const statModifier = getStatModifier(statValue);
+            
+            // Get status disadvantage
+            const disadvantage = getStatusDisadvantage();
+            
+            // Calculate hit bonus (stat + proficiency + disadvantage)
+            const hitBonus = statModifier + proficiency + disadvantage;
+            
+            // Calculate damage bonus (stat + disadvantage)
+            const damageBonus = statModifier + disadvantage;
+            
+            // Update display
+            document.getElementById('calculatedHitBonus').textContent = (hitBonus >= 0 ? '+' : '') + hitBonus;
+            document.getElementById('calculatedDamageBonus').textContent = (damageBonus >= 0 ? '+' : '') + damageBonus;
+            document.getElementById('fullDamage').textContent = damageDie + (damageBonus >= 0 ? '+' : '') + damageBonus;
+        }
+
+        function addCreatedWeapon() {
+            const weaponName = document.getElementById('weaponName').value || document.getElementById('weaponType').options[document.getElementById('weaponType').selectedIndex].text;
+            const hitBonus = document.getElementById('calculatedHitBonus').textContent;
+            const damageDie = document.getElementById('weaponDamageDie').value;
+            const damageBonus = document.getElementById('calculatedDamageBonus').textContent;
+            const damageType = document.getElementById('weaponDamageType').value;
+            
+            const fullDamage = damageDie + damageBonus;
+            const notes = `${damageType} ${document.getElementById('weaponStat').value.toUpperCase()}`;
+            
+            // Add to weapons table
+            const tbody = document.querySelector('#weaponsTable tbody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="weapon-name" value="${weaponName}"></td>
+                <td><input type="text" class="weapon-hit" value="${hitBonus}"></td>
+                <td><input type="text" class="weapon-damage" value="${fullDamage}"></td>
+                <td><input type="text" class="weapon-ammo"></td>
+                <td><input type="text" class="weapon-notes" value="${notes}"></td>
+            `;
+            tbody.appendChild(row);
+            
+            // Clear form
+            document.getElementById('weaponName').value = '';
+            document.getElementById('weaponType').value = '';
+            updateWeaponStats();
+        }
+
         // Initialize everything when page loads
         document.addEventListener('DOMContentLoaded', function() {
             initializeSkillsTable();
             initializeStatusTrackers();
             updateStatModifiers(); // Initial calculation
+            updateWeaponStats(); // Initial weapon calculation
         });
     </script>
 </body>
