@@ -1390,6 +1390,9 @@
                 });
             });
 
+            // Save to localStorage
+            localStorage.setItem('deadWorldCharacter', JSON.stringify(characterData));
+            
             // Create and download JSON file
             const dataStr = JSON.stringify(characterData, null, 2);
             const dataBlob = new Blob([dataStr], { type: 'application/json' });
@@ -1402,7 +1405,148 @@
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
             
-            alert('Character exported successfully!');
+            alert('Character saved successfully!');
+        }
+
+        // Load character from localStorage
+        function loadCharacter() {
+            const savedData = localStorage.getItem('deadWorldCharacter');
+            if (!savedData) {
+                return; // No saved data found
+            }
+
+            try {
+                const characterData = JSON.parse(savedData);
+                
+                // Load basic info
+                document.getElementById('name').value = characterData.name || '';
+                document.getElementById('age').value = characterData.age || '';
+                document.getElementById('gender').value = characterData.gender || '';
+                document.getElementById('background').value = characterData.background || '';
+                document.getElementById('startingProfession').value = characterData.startingProfession || '';
+                document.getElementById('currentProfessions').value = characterData.currentProfessions || '';
+
+                // Load stats
+                if (characterData.stats) {
+                    document.getElementById('str').value = characterData.stats.str || '';
+                    document.getElementById('dex').value = characterData.stats.dex || '';
+                    document.getElementById('con').value = characterData.stats.con || '';
+                    document.getElementById('int').value = characterData.stats.int || '';
+                    document.getElementById('wis').value = characterData.stats.wis || '';
+                    document.getElementById('cha').value = characterData.stats.cha || '';
+                }
+
+                // Load combat stats
+                document.getElementById('hp').value = characterData.hp || '';
+                document.getElementById('ac').value = characterData.ac || '';
+                document.getElementById('speed').value = characterData.speed || '';
+                document.getElementById('initiative').value = characterData.initiative || '';
+                document.getElementById('proficiency').value = characterData.proficiency || '';
+
+                // Load status trackers
+                if (characterData.stress) {
+                    const stressOption = document.querySelector(`[data-stress="${characterData.stress}"]`);
+                    if (stressOption) stressOption.click();
+                }
+                if (characterData.infection) {
+                    const infectionOption = document.querySelector(`[data-infection="${characterData.infection}"]`);
+                    if (infectionOption) infectionOption.click();
+                }
+                if (characterData.exhaustion) {
+                    const exhaustionOption = document.querySelector(`[data-exhaustion="${characterData.exhaustion}"]`);
+                    if (exhaustionOption) exhaustionOption.click();
+                }
+
+                // Load equipment slots
+                if (characterData.equipmentSlots) {
+                    document.getElementById('head').value = characterData.equipmentSlots.head || '';
+                    document.getElementById('neck').value = characterData.equipmentSlots.neck || '';
+                    document.getElementById('body').value = characterData.equipmentSlots.body || '';
+                    document.getElementById('back').value = characterData.equipmentSlots.back || '';
+                    document.getElementById('hands').value = characterData.equipmentSlots.hands || '';
+                    document.getElementById('waist').value = characterData.equipmentSlots.waist || '';
+                    document.getElementById('legs').value = characterData.equipmentSlots.legs || '';
+                    document.getElementById('feet').value = characterData.equipmentSlots.feet || '';
+                }
+
+                // Load other fields
+                document.getElementById('biteProtection').value = characterData.biteProtection || '';
+                document.getElementById('shield').value = characterData.shield || '';
+                document.getElementById('food').value = characterData.food || '';
+                document.getElementById('water').value = characterData.water || '';
+                document.getElementById('medicalSupplies').value = characterData.medicalSupplies || '';
+                document.getElementById('studyMaterials').value = characterData.studyMaterials || '';
+                document.getElementById('lifeHacks').value = characterData.lifeHacks || '';
+                document.getElementById('notes').value = characterData.notes || '';
+
+                // Load weapons
+                if (characterData.weapons && characterData.weapons.length > 0) {
+                    const weapContainer = document.getElementById('weaponsContainer');
+                    weapContainer.innerHTML = '';
+                    characterData.weapons.forEach((weapon, index) => {
+                        const block = document.createElement('div');
+                        block.className = 'weapon-block';
+                        block.innerHTML = `
+                            <button class="remove-weapon" onclick="removeWeapon(this)">×</button>
+                            <div class="weapon-header">${weapon.name || `Weapon ${index + 1}`}</div>
+                            <div class="weapon-field">
+                                <label>WEAPON NAME</label>
+                                <input type="text" class="weapon-name" value="${weapon.name || ''}">
+                            </div>
+                            <div class="weapon-field">
+                                <label>+HIT</label>
+                                <input type="text" class="weapon-hit" value="${weapon.hit || ''}">
+                            </div>
+                            <div class="weapon-field">
+                                <label>DAMAGE</label>
+                                <input type="text" class="weapon-damage" value="${weapon.damage || ''}">
+                            </div>
+                            <div class="weapon-field">
+                                <label>AMMO</label>
+                                <input type="text" class="weapon-ammo" value="${weapon.ammo || ''}">
+                            </div>
+                            <div class="weapon-field">
+                                <label>NOTES</label>
+                                <input type="text" class="weapon-notes" value="${weapon.notes || ''}">
+                            </div>
+                        `;
+                        weapContainer.appendChild(block);
+                    });
+                }
+
+                // Load allies
+                if (characterData.allies && characterData.allies.length > 0) {
+                    const alliesContainer = document.getElementById('alliesContainer');
+                    alliesContainer.innerHTML = '';
+                    characterData.allies.forEach((ally, index) => {
+                        const block = document.createElement('div');
+                        block.className = 'weapon-block';
+                        block.innerHTML = `
+                            <button class="remove-weapon" onclick="removeAlly(this)">×</button>
+                            <div class="weapon-header">${ally.name || `Ally ${index + 1}`}</div>
+                            <div class="weapon-field">
+                                <label>NAME</label>
+                                <input type="text" class="ally-name" value="${ally.name || ''}">
+                            </div>
+                            <div class="weapon-field">
+                                <label>LOCATION</label>
+                                <input type="text" class="ally-location" value="${ally.location || ''}">
+                            </div>
+                            <div class="weapon-field">
+                                <label>NOTES</label>
+                                <input type="text" class="ally-notes" value="${ally.notes || ''}">
+                            </div>
+                        `;
+                        alliesContainer.appendChild(block);
+                    });
+                }
+
+                // Update calculations
+                updateStatModifiers();
+                
+            } catch (error) {
+                console.error('Error loading character:', error);
+            }
         }
 
         // Import character from JSON file
@@ -1872,12 +2016,32 @@
             }
         }
 
+        // Auto-save functionality
+        function autoSave() {
+            saveCharacter();
+        }
+
+        // Add auto-save to all inputs
+        function addAutoSaveListeners() {
+            const inputs = document.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                input.addEventListener('change', autoSave);
+                input.addEventListener('input', autoSave);
+            });
+        }
+
         // Initialize everything when page loads
         document.addEventListener('DOMContentLoaded', function() {
             initializeSkillsTable();
             initializeStatusTrackers();
             updateStatModifiers(); // Initial calculation
             updateWeaponStats(); // Initial weapon calculation
+            
+            // Load saved data on startup
+            loadCharacter();
+            
+            // Add auto-save listeners
+            addAutoSaveListeners();
         });
     </script>
 </body>
