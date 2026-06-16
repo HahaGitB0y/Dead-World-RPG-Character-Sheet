@@ -370,6 +370,55 @@
             background: #c53030;
         }
         
+        .collapsible-section {
+            margin-bottom: 10px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .collapsible-header {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+            border-bottom: 1px solid #555;
+        }
+        
+        .collapsible-header:hover {
+            background: linear-gradient(135deg, #5a6578 0%, #3d4758 100%);
+        }
+        
+        .collapsible-header h3 {
+            margin: 0;
+            color: #4ecdc4;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .collapsible-toggle {
+            color: #4ecdc4;
+            font-size: 18px;
+            transition: transform 0.3s;
+        }
+        
+        .collapsible-toggle.expanded {
+            transform: rotate(180deg);
+        }
+        
+        .collapsible-content {
+            background: #333;
+            padding: 15px;
+            display: none;
+        }
+        
+        .collapsible-content.show {
+            display: block;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -815,26 +864,94 @@
         </div>
 
         <div class="section">
-            <h2>ALLIES & CONTACTS</h2>
-            <div class="weapons-container" id="alliesContainer">
-                <div class="weapon-block">
-                    <button class="remove-weapon" onclick="removeAlly(this)">×</button>
-                    <div class="weapon-header">Ally 1</div>
-                    <div class="weapon-field">
-                        <label>NAME</label>
-                        <input type="text" class="ally-name" placeholder="Enter ally name">
+            <h2>ALLIES, CONTACTS & ENEMIES</h2>
+            
+            <!-- Allies Section -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" onclick="toggleCollapsible('allies')">
+                    <h3>🤝 ALLIES</h3>
+                    <span class="collapsible-toggle" id="allies-toggle">▼</span>
+                </div>
+                <div class="collapsible-content" id="allies-content">
+                    <div class="weapons-container" id="alliesContainer">
+                        <div class="weapon-block">
+                            <button class="remove-weapon" onclick="removeAlly(this)">×</button>
+                            <div class="weapon-header">Ally 1</div>
+                            <div class="weapon-field">
+                                <label>NAME</label>
+                                <input type="text" class="ally-name" placeholder="Enter ally name">
+                            </div>
+                            <div class="weapon-field">
+                                <label>LOCATION</label>
+                                <input type="text" class="ally-location" placeholder="Where to find them">
+                            </div>
+                            <div class="weapon-field">
+                                <label>NOTES</label>
+                                <input type="text" class="ally-notes" placeholder="Relationship, skills, etc.">
+                            </div>
+                        </div>
                     </div>
-                    <div class="weapon-field">
-                        <label>LOCATION</label>
-                        <input type="text" class="ally-location" placeholder="Where to find them">
-                    </div>
-                    <div class="weapon-field">
-                        <label>NOTES</label>
-                        <input type="text" class="ally-notes" placeholder="Relationship, skills, etc.">
-                    </div>
+                    <button onclick="addAllyBlock()">Add Ally</button>
                 </div>
             </div>
-            <button onclick="addAllyBlock()">Add Ally</button>
+            
+            <!-- Contacts Section -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" onclick="toggleCollapsible('contacts')">
+                    <h3>📞 CONTACTS</h3>
+                    <span class="collapsible-toggle" id="contacts-toggle">▼</span>
+                </div>
+                <div class="collapsible-content" id="contacts-content">
+                    <div class="weapons-container" id="contactsContainer">
+                        <div class="weapon-block">
+                            <button class="remove-weapon" onclick="removeContact(this)">×</button>
+                            <div class="weapon-header">Contact 1</div>
+                            <div class="weapon-field">
+                                <label>NAME</label>
+                                <input type="text" class="contact-name" placeholder="Enter contact name">
+                            </div>
+                            <div class="weapon-field">
+                                <label>LOCATION</label>
+                                <input type="text" class="contact-location" placeholder="Where to find them">
+                            </div>
+                            <div class="weapon-field">
+                                <label>NOTES</label>
+                                <input type="text" class="contact-notes" placeholder="Services, payment, etc.">
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="addContactBlock()">Add Contact</button>
+                </div>
+            </div>
+            
+            <!-- Enemies Section -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" onclick="toggleCollapsible('enemies')">
+                    <h3>⚔️ ENEMIES</h3>
+                    <span class="collapsible-toggle" id="enemies-toggle">▼</span>
+                </div>
+                <div class="collapsible-content" id="enemies-content">
+                    <div class="weapons-container" id="enemiesContainer">
+                        <div class="weapon-block">
+                            <button class="remove-weapon" onclick="removeEnemy(this)">×</button>
+                            <div class="weapon-header">Enemy 1</div>
+                            <div class="weapon-field">
+                                <label>NAME</label>
+                                <input type="text" class="enemy-name" placeholder="Enter enemy name">
+                            </div>
+                            <div class="weapon-field">
+                                <label>LOCATION</label>
+                                <input type="text" class="enemy-location" placeholder="Where they operate">
+                            </div>
+                            <div class="weapon-field">
+                                <label>NOTES</label>
+                                <input type="text" class="enemy-notes" placeholder="Threat level, motivations, etc.">
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="addEnemyBlock()">Add Enemy</button>
+                </div>
+            </div>
         </div>
 
         <div class="section">
@@ -1255,6 +1372,24 @@
                 });
             });
 
+            // Save contacts
+            document.querySelectorAll('#contactsContainer .weapon-block').forEach(block => {
+                characterData.contacts.push({
+                    name: block.querySelector('.contact-name').value,
+                    location: block.querySelector('.contact-location').value,
+                    notes: block.querySelector('.contact-notes').value
+                });
+            });
+
+            // Save enemies
+            document.querySelectorAll('#enemiesContainer .weapon-block').forEach(block => {
+                characterData.enemies.push({
+                    name: block.querySelector('.enemy-name').value,
+                    location: block.querySelector('.enemy-location').value,
+                    notes: block.querySelector('.enemy-notes').value
+                });
+            });
+
             // Create and download JSON file
             const dataStr = JSON.stringify(characterData, null, 2);
             const dataBlob = new Blob([dataStr], { type: 'application/json' });
@@ -1666,6 +1801,75 @@
         
         function removeAlly(button) {
             button.parentElement.remove();
+        }
+        
+        function addContactBlock() {
+            const container = document.getElementById('contactsContainer');
+            const contactCount = container.children.length + 1;
+            const block = document.createElement('div');
+            block.className = 'weapon-block';
+            block.innerHTML = `
+                <button class="remove-weapon" onclick="removeContact(this)">×</button>
+                <div class="weapon-header">Contact ${contactCount}</div>
+                <div class="weapon-field">
+                    <label>NAME</label>
+                    <input type="text" class="contact-name" placeholder="Enter contact name">
+                </div>
+                <div class="weapon-field">
+                    <label>LOCATION</label>
+                    <input type="text" class="contact-location" placeholder="Where to find them">
+                </div>
+                <div class="weapon-field">
+                    <label>NOTES</label>
+                    <input type="text" class="contact-notes" placeholder="Services, payment, etc.">
+                </div>
+            `;
+            container.appendChild(block);
+        }
+        
+        function removeContact(button) {
+            button.parentElement.remove();
+        }
+        
+        function addEnemyBlock() {
+            const container = document.getElementById('enemiesContainer');
+            const enemyCount = container.children.length + 1;
+            const block = document.createElement('div');
+            block.className = 'weapon-block';
+            block.innerHTML = `
+                <button class="remove-weapon" onclick="removeEnemy(this)">×</button>
+                <div class="weapon-header">Enemy ${enemyCount}</div>
+                <div class="weapon-field">
+                    <label>NAME</label>
+                    <input type="text" class="enemy-name" placeholder="Enter enemy name">
+                </div>
+                <div class="weapon-field">
+                    <label>LOCATION</label>
+                    <input type="text" class="enemy-location" placeholder="Where they operate">
+                </div>
+                <div class="weapon-field">
+                    <label>NOTES</label>
+                    <input type="text" class="enemy-notes" placeholder="Threat level, motivations, etc.">
+                </div>
+            `;
+            container.appendChild(block);
+        }
+        
+        function removeEnemy(button) {
+            button.parentElement.remove();
+        }
+        
+        function toggleCollapsible(sectionId) {
+            const content = document.getElementById(sectionId + '-content');
+            const toggle = document.getElementById(sectionId + '-toggle');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                toggle.classList.remove('expanded');
+            } else {
+                content.classList.add('show');
+                toggle.classList.add('expanded');
+            }
         }
 
         // Initialize everything when page loads
