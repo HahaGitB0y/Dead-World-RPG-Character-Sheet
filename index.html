@@ -471,9 +471,10 @@
         <h1>DEAD WORLD CHARACTER SHEET</h1>
         
         <div class="button-group">
-            <button onclick="saveCharacterToFile()">📋 Copy Character Data</button>
-            <button onclick="document.getElementById('loadFile').click()">📁 Load from File</button>
-            <button onclick="loadFromClipboard()">📋 Load from Clipboard</button>
+            <button onclick="saveCharacterToFile()">💾 Save Character</button>
+            <button onclick="document.getElementById('loadFile').click()">📁 Load Character</button>
+            <button onclick="saveToLocal()">📱 Save to Device</button>
+            <button onclick="loadFromLocal()">📱 Load from Device</button>
             <button onclick="clearCharacter()">🗑️ Clear All</button>
             <input type="file" id="loadFile" accept=".json" style="display: none;" onchange="loadCharacterFromFile(event)">
         </div>
@@ -1527,23 +1528,30 @@
             return characterData;
         }
 
-        // Save character to clipboard
+        // Save character to file using multiple methods
         function saveCharacterToFile() {
             console.log('Save button clicked!');
             try {
                 const characterData = getCharacterData();
                 const dataStr = JSON.stringify(characterData, null, 2);
+                const fileName = `${characterData.name || 'Character'}_DeadWorld.json`;
                 
-                // Try to save to clipboard
-                if (navigator.clipboard && window.isSecureContext) {
-                    navigator.clipboard.writeText(dataStr).then(() => {
-                        alert('Character data copied to clipboard!\n\nPaste this into a notes app or text editor to save it.\n\nData includes: ' + characterData.name);
+                // Method 1: Try Web Share API (iOS 13+)
+                if (navigator.share && window.isSecureContext) {
+                    const file = new File([dataStr], fileName, { type: 'application/json' });
+                    navigator.share({
+                        title: 'Dead World Character',
+                        text: `Character sheet for ${characterData.name}`,
+                        files: [file]
+                    }).then(() => {
+                        console.log('Character shared successfully');
                     }).catch(err => {
-                        console.error('Clipboard failed:', err);
-                        fallbackSave(dataStr, characterData);
+                        console.log('Web Share failed, trying download:', err);
+                        tryFileDownload(dataStr, fileName);
                     });
                 } else {
-                    fallbackSave(dataStr, characterData);
+                    // Method 2: Try direct download
+                    tryFileDownload(dataStr, fileName);
                 }
             } catch (error) {
                 console.error('Save error:', error);
@@ -1551,83 +1559,38 @@
             }
         }
 
-        // Fallback save method
-        function fallbackSave(dataStr, characterData) {
-            // Create a text area and display the data
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.8);
-                z-index: 10000;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 20px;
-                box-sizing: border-box;
-            `;
-            
-            const content = document.createElement('div');
-            content.style.cssText = `
-                background: #2a2a2a;
-                color: #fff;
-                padding: 20px;
-                border-radius: 10px;
-                max-width: 90%;
-                max-height: 80%;
-                overflow-y: auto;
-                position: relative;
-            `;
-            
-            content.innerHTML = `
-                <h3 style="margin-top: 0; color: #4ecdc4;">Character Data for ${characterData.name}</h3>
-                <p style="color: #ccc; font-size: 14px;">Select all text below, copy it, and save it in a notes app:</p>
-                <textarea readonly style="width: 100%; height: 300px; background: #1a1a1a; color: #fff; border: 1px solid #555; padding: 10px; font-family: monospace; font-size: 12px; border-radius: 5px;">${dataStr}</textarea>
-                <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 10px; background: #4ecdc4; color: #000; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">Close</button>
-            `;
-            
-            modal.appendChild(content);
-            document.body.appendChild(modal);
-            
-            // Auto-select the text
-            const textarea = content.querySelector('textarea');
-            textarea.focus();
-            textarea.select();
-            
-            // Try to copy automatically
+        // Try file download method
+        function tryFileDownload(dataStr, fileName) {
             try {
-                document.execCommand('copy');
-                alert('Character data copied to clipboard! (If not, select and copy manually)');
-            } catch (err) {
-                console.log('Auto-copy failed, user must copy manually');
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                
+                // Trigger download
+                link.click();
+                
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    alert('Character saved! Check your Downloads folder.');
+                }, 100);
+                
+            } catch (error) {
+                console.log('Download failed, trying fallback:', error);
+                fallbackSave(dataStr, fileName);
             }
         }
 
-        // Load character from clipboard
-        function loadFromClipboard() {
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.readText().then(text => {
-                    try {
-                        const characterData = JSON.parse(text);
-                        loadCharacterData(characterData);
-                        alert('Character loaded from clipboard!');
-                    } catch (error) {
-                        alert('Invalid character data in clipboard: ' + error.message);
-                    }
-                }).catch(err => {
-                    console.error('Clipboard read failed:', err);
-                    fallbackLoad();
-                });
-            } else {
-                fallbackLoad();
-            }
-        }
-
-        // Fallback load method
-        function fallbackLoad() {
+        // Fallback save method
+        function fallbackSave(dataStr, fileName) {
+            // Create a modal with copyable text and instructions
             const modal = document.createElement('div');
             modal.style.cssText = `
                 position: fixed;
@@ -1635,7 +1598,7 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0,0,0,0.8);
+                background: rgba(0,0,0,0.9);
                 z-index: 10000;
                 display: flex;
                 align-items: center;
@@ -1650,45 +1613,215 @@
                 color: #fff;
                 padding: 20px;
                 border-radius: 10px;
-                max-width: 90%;
-                max-height: 80%;
+                max-width: 95%;
+                max-height: 85%;
                 overflow-y: auto;
                 position: relative;
             `;
             
             content.innerHTML = `
-                <h3 style="margin-top: 0; color: #4ecdc4;">Load Character Data</h3>
-                <p style="color: #ccc; font-size: 14px;">Paste your character data below:</p>
-                <textarea id="characterDataInput" style="width: 100%; height: 300px; background: #1a1a1a; color: #fff; border: 1px solid #555; padding: 10px; font-family: monospace; font-size: 12px; border-radius: 5px;" placeholder="Paste character JSON data here..."></textarea>
-                <div style="margin-top: 10px;">
-                    <button onclick="loadFromText()" style="background: #4ecdc4; color: #000; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 10px;">Load Character</button>
-                    <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: #666; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Cancel</button>
+                <h3 style="margin-top: 0; color: #4ecdc4;">Save Character Data</h3>
+                <p style="color: #ccc; font-size: 14px; margin-bottom: 15px;">
+                    <strong>Option 1:</strong> Select all text below, copy it, and save it in a text file or Notes app.<br>
+                    <strong>Option 2:</strong> Take a screenshot of this data for backup.<br>
+                    <strong>Option 3:</strong> Email this data to yourself.
+                </p>
+                <textarea readonly style="width: 100%; height: 250px; background: #1a1a1a; color: #fff; border: 1px solid #555; padding: 10px; font-family: monospace; font-size: 11px; border-radius: 5px;">${dataStr}</textarea>
+                <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button onclick="copyToClipboard()" style="background: #4ecdc4; color: #000; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">📋 Copy Text</button>
+                    <button onclick="emailCharacterData()" style="background: #666; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">📧 Email Data</button>
+                    <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: #e53e3e; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Close</button>
                 </div>
             `;
             
             modal.appendChild(content);
             document.body.appendChild(modal);
             
-            // Focus on textarea
-            document.getElementById('characterDataInput').focus();
+            // Store data globally for button functions
+            window.currentCharacterData = dataStr;
+            window.currentFileName = fileName;
+            
+            // Auto-select the text
+            const textarea = content.querySelector('textarea');
+            textarea.focus();
+            textarea.select();
         }
 
-        // Load character from text input
-        function loadFromText() {
-            const text = document.getElementById('characterDataInput').value;
-            if (!text.trim()) {
-                alert('Please paste character data first');
-                return;
+        // Copy to clipboard function
+        function copyToClipboard() {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(window.currentCharacterData).then(() => {
+                    alert('Character data copied to clipboard! Save it in a text file or Notes app.');
+                }).catch(err => {
+                    console.error('Clipboard failed:', err);
+                    alert('Please select the text manually and copy it.');
+                });
+            } else {
+                // Fallback for older browsers
+                const textarea = document.querySelector('textarea[readonly]');
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    alert('Character data copied! Save it in a text file or Notes app.');
+                } catch (err) {
+                    alert('Please select the text manually and copy it.');
+                }
             }
-            
+        }
+
+        // Email character data function
+        function emailCharacterData() {
+            const subject = encodeURIComponent('Dead World Character Data');
+            const body = encodeURIComponent(`Here is my Dead World character data:\n\n${window.currentCharacterData}\n\nSave this as a .json file to load it later.`);
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        }
+
+        // IndexedDB setup for device storage
+        let db;
+        const dbName = 'DeadWorldCharacterDB';
+        const storeName = 'characters';
+
+        // Initialize IndexedDB
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(dbName, 1);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    db = event.target.result;
+                    if (!db.objectStoreNames.contains(storeName)) {
+                        db.createObjectStore(storeName, { keyPath: 'id' });
+                    }
+                };
+            });
+        }
+
+        // Save character to IndexedDB
+        async function saveToLocal() {
             try {
-                const characterData = JSON.parse(text);
-                loadCharacterData(characterData);
-                document.querySelector('[style*="position: fixed"]').remove(); // Close modal
-                alert('Character loaded successfully!');
+                await initDB();
+                const characterData = getCharacterData();
+                const characterId = characterData.name || 'Character';
+                
+                const transaction = db.transaction([storeName], 'readwrite');
+                const store = transaction.objectStore(storeName);
+                
+                const saveData = {
+                    id: characterId,
+                    data: characterData,
+                    timestamp: new Date().toISOString()
+                };
+                
+                await store.put(saveData);
+                alert('Character saved to device storage!\n\nUse "Load from Device" to restore it.');
+                
             } catch (error) {
-                alert('Invalid character data: ' + error.message);
+                console.error('IndexedDB save failed:', error);
+                alert('Device storage not available. Use regular Save button instead.');
             }
+        }
+
+        // Load character from IndexedDB
+        async function loadFromLocal() {
+            try {
+                await initDB();
+                
+                const transaction = db.transaction([storeName], 'readonly');
+                const store = transaction.objectStore(storeName);
+                const request = store.getAll();
+                
+                request.onsuccess = () => {
+                    const characters = request.result;
+                    
+                    if (characters.length === 0) {
+                        alert('No saved characters found on device.');
+                        return;
+                    }
+                    
+                    // Show character selection modal
+                    showCharacterSelection(characters);
+                };
+                
+                request.onerror = () => {
+                    alert('Error loading characters from device storage.');
+                };
+                
+            } catch (error) {
+                console.error('IndexedDB load failed:', error);
+                alert('Device storage not available. Use regular Load button instead.');
+            }
+        }
+
+        // Show character selection modal
+        function showCharacterSelection(characters) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.9);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                box-sizing: border-box;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: #2a2a2a;
+                color: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                max-width: 90%;
+                max-height: 80%;
+                overflow-y: auto;
+                position: relative;
+            `;
+            
+            let characterList = characters.map(char => {
+                const date = new Date(char.timestamp).toLocaleString();
+                return `
+                    <div style="border: 1px solid #555; padding: 15px; margin: 10px 0; border-radius: 5px; cursor: pointer;" onclick="loadSelectedCharacter('${char.id}')">
+                        <h4 style="margin: 0 0 5px 0; color: #4ecdc4;">${char.id}</h4>
+                        <p style="margin: 0; color: #ccc; font-size: 12px;">Saved: ${date}</p>
+                        <p style="margin: 5px 0 0 0; color: #999; font-size: 11px;">Level ${char.data.level || 1} ${char.data.startingProfession || 'Character'}</p>
+                    </div>
+                `;
+            }).join('');
+            
+            content.innerHTML = `
+                <h3 style="margin-top: 0; color: #4ecdc4;">Select Character to Load</h3>
+                ${characterList}
+                <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 15px; background: #e53e3e; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%;">Cancel</button>
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+        }
+
+        // Load selected character
+        function loadSelectedCharacter(characterId) {
+            const transaction = db.transaction([storeName], 'readonly');
+            const store = transaction.objectStore(storeName);
+            const request = store.get(characterId);
+            
+            request.onsuccess = () => {
+                const character = request.result;
+                if (character) {
+                    loadCharacterData(character.data);
+                    document.querySelector('[style*="position: fixed"]').remove();
+                    alert(`Character "${characterId}" loaded successfully!`);
+                }
+            };
         }
 
         // Load character from file
