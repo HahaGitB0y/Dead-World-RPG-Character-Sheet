@@ -1528,21 +1528,32 @@
 
         // Save character to file
         function saveCharacterToFile() {
+            console.log('Save button clicked!');
             try {
-                const characterData = getCharacterData();
-                const dataStr = JSON.stringify(characterData, null, 2);
+                // Test basic functionality first
+                const testData = {
+                    name: document.getElementById('name').value || 'Test Character',
+                    test: 'This is a test save',
+                    timestamp: new Date().toISOString()
+                };
+                
+                console.log('Creating file with data:', testData);
+                
+                const dataStr = JSON.stringify(testData, null, 2);
                 const dataBlob = new Blob([dataStr], { type: 'application/json' });
                 const url = URL.createObjectURL(dataBlob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = `${characterData.name || 'Character'}_DeadWorld.json`;
+                link.download = `${testData.name}_Test.json`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
                 
-                alert('Character saved to device!');
+                console.log('File download triggered');
+                alert('Test character saved to device!');
             } catch (error) {
+                console.error('Save error:', error);
                 alert('Error saving character: ' + error.message);
             }
         }
