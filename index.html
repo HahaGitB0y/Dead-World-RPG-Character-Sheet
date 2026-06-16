@@ -501,15 +501,103 @@
             
             function handleSaveDevice() {
                 try {
-                    const name = document.getElementById('name').value || 'Test Character';
+                    // Get ALL character data
                     const characterData = {
-                        name: name,
-                        hp: document.getElementById('hp').value || '10',
-                        ac: document.getElementById('ac').value || '10',
+                        name: document.getElementById('name').value || 'Character',
+                        age: document.getElementById('age').value || '',
+                        gender: document.getElementById('gender').value || '',
+                        background: document.getElementById('background').value || '',
+                        startingProfession: document.getElementById('startingProfession').value || '',
+                        currentProfessions: document.getElementById('currentProfessions').value || '',
+                        stats: {
+                            str: document.getElementById('str').value || '',
+                            dex: document.getElementById('dex').value || '',
+                            con: document.getElementById('con').value || '',
+                            int: document.getElementById('int').value || '',
+                            wis: document.getElementById('wis').value || '',
+                            cha: document.getElementById('cha').value || ''
+                        },
+                        hp: document.getElementById('hp').value || '',
+                        ac: document.getElementById('ac').value || '',
+                        speed: document.getElementById('speed').value || '',
+                        initiative: document.getElementById('initiative').value || '',
+                        proficiency: document.getElementById('proficiency').value || '',
+                        stress: document.querySelector('[data-stress].active')?.dataset.stress || '0',
+                        infection: document.querySelector('[data-infection].active')?.dataset.infection || 'clean',
+                        exhaustion: document.querySelector('[data-exhaustion].active')?.dataset.exhaustion || '0',
+                        savingThrows: {
+                            str: document.getElementById('saveStr')?.checked || false,
+                            dex: document.getElementById('saveDex')?.checked || false,
+                            con: document.getElementById('saveCon')?.checked || false,
+                            int: document.getElementById('saveInt')?.checked || false,
+                            wis: document.getElementById('saveWis')?.checked || false,
+                            cha: document.getElementById('saveCha')?.checked || false
+                        },
+                        equipmentSlots: {
+                            head: document.getElementById('head').value || '',
+                            neck: document.getElementById('neck').value || '',
+                            body: document.getElementById('body').value || '',
+                            back: document.getElementById('back').value || '',
+                            hands: document.getElementById('hands').value || '',
+                            waist: document.getElementById('waist').value || '',
+                            legs: document.getElementById('legs').value || '',
+                            feet: document.getElementById('feet').value || ''
+                        },
+                        biteProtection: document.getElementById('biteProtection').value || '',
+                        shield: document.getElementById('shield').value || '',
+                        food: document.getElementById('food').value || '',
+                        water: document.getElementById('water').value || '',
+                        medicalSupplies: document.getElementById('medicalSupplies').value || '',
+                        studyMaterials: document.getElementById('studyMaterials').value || '',
+                        lifeHacks: document.getElementById('lifeHacks').value || '',
+                        notes: document.getElementById('notes').value || '',
+                        weapons: [],
+                        allies: [],
+                        contacts: [],
+                        enemies: [],
                         timestamp: new Date().toISOString()
                     };
+                    
+                    // Save weapons
+                    document.querySelectorAll('#weaponsContainer .weapon-block').forEach(block => {
+                        characterData.weapons.push({
+                            name: block.querySelector('.weapon-name')?.value || '',
+                            hit: block.querySelector('.weapon-hit')?.value || '',
+                            damage: block.querySelector('.weapon-damage')?.value || '',
+                            ammo: block.querySelector('.weapon-ammo')?.value || '',
+                            notes: block.querySelector('.weapon-notes')?.value || ''
+                        });
+                    });
+                    
+                    // Save allies
+                    document.querySelectorAll('#alliesContainer .weapon-block').forEach(block => {
+                        characterData.allies.push({
+                            name: block.querySelector('.ally-name')?.value || '',
+                            location: block.querySelector('.ally-location')?.value || '',
+                            notes: block.querySelector('.ally-notes')?.value || ''
+                        });
+                    });
+                    
+                    // Save contacts
+                    document.querySelectorAll('#contactsContainer .weapon-block').forEach(block => {
+                        characterData.contacts.push({
+                            name: block.querySelector('.contact-name')?.value || '',
+                            location: block.querySelector('.contact-location')?.value || '',
+                            notes: block.querySelector('.contact-notes')?.value || ''
+                        });
+                    });
+                    
+                    // Save enemies
+                    document.querySelectorAll('#enemiesContainer .weapon-block').forEach(block => {
+                        characterData.enemies.push({
+                            name: block.querySelector('.enemy-name')?.value || '',
+                            location: block.querySelector('.enemy-location')?.value || '',
+                            notes: block.querySelector('.enemy-notes')?.value || ''
+                        });
+                    });
+                    
                     localStorage.setItem('deadWorldCharacter', JSON.stringify(characterData));
-                    alert('Character saved to device storage!\n\nName: ' + characterData.name + '\nHP: ' + characterData.hp + '\nAC: ' + characterData.ac);
+                    alert('Character saved to device storage!\n\nName: ' + characterData.name + '\nHP: ' + characterData.hp + '\nAC: ' + characterData.ac + '\nWeapons: ' + characterData.weapons.length + '\nAllies: ' + characterData.allies.length);
                 } catch (error) {
                     alert('Device storage not available: ' + error.message);
                 }
@@ -523,10 +611,199 @@
                         return;
                     }
                     const characterData = JSON.parse(savedData);
+                    
+                    // Load basic info
                     document.getElementById('name').value = characterData.name || '';
+                    document.getElementById('age').value = characterData.age || '';
+                    document.getElementById('gender').value = characterData.gender || '';
+                    document.getElementById('background').value = characterData.background || '';
+                    document.getElementById('startingProfession').value = characterData.startingProfession || '';
+                    document.getElementById('currentProfessions').value = characterData.currentProfessions || '';
+                    
+                    // Load stats
+                    if (characterData.stats) {
+                        document.getElementById('str').value = characterData.stats.str || '';
+                        document.getElementById('dex').value = characterData.stats.dex || '';
+                        document.getElementById('con').value = characterData.stats.con || '';
+                        document.getElementById('int').value = characterData.stats.int || '';
+                        document.getElementById('wis').value = characterData.stats.wis || '';
+                        document.getElementById('cha').value = characterData.stats.cha || '';
+                    }
+                    
+                    // Load combat stats
                     document.getElementById('hp').value = characterData.hp || '';
                     document.getElementById('ac').value = characterData.ac || '';
-                    alert('Character loaded successfully!\n\nName: ' + characterData.name + '\nHP: ' + characterData.hp + '\nAC: ' + characterData.ac);
+                    document.getElementById('speed').value = characterData.speed || '';
+                    document.getElementById('initiative').value = characterData.initiative || '';
+                    document.getElementById('proficiency').value = characterData.proficiency || '';
+                    
+                    // Load status trackers
+                    if (characterData.stress) {
+                        const stressOption = document.querySelector(`[data-stress="${characterData.stress}"]`);
+                        if (stressOption) stressOption.click();
+                    }
+                    if (characterData.infection) {
+                        const infectionOption = document.querySelector(`[data-infection="${characterData.infection}"]`);
+                        if (infectionOption) infectionOption.click();
+                    }
+                    if (characterData.exhaustion) {
+                        const exhaustionOption = document.querySelector(`[data-exhaustion="${characterData.exhaustion}"]`);
+                        if (exhaustionOption) exhaustionOption.click();
+                    }
+                    
+                    // Load saving throws
+                    if (characterData.savingThrows) {
+                        document.getElementById('saveStr').checked = characterData.savingThrows.str || false;
+                        document.getElementById('saveDex').checked = characterData.savingThrows.dex || false;
+                        document.getElementById('saveCon').checked = characterData.savingThrows.con || false;
+                        document.getElementById('saveInt').checked = characterData.savingThrows.int || false;
+                        document.getElementById('saveWis').checked = characterData.savingThrows.wis || false;
+                        document.getElementById('saveCha').checked = characterData.savingThrows.cha || false;
+                    }
+                    
+                    // Load equipment slots
+                    if (characterData.equipmentSlots) {
+                        document.getElementById('head').value = characterData.equipmentSlots.head || '';
+                        document.getElementById('neck').value = characterData.equipmentSlots.neck || '';
+                        document.getElementById('body').value = characterData.equipmentSlots.body || '';
+                        document.getElementById('back').value = characterData.equipmentSlots.back || '';
+                        document.getElementById('hands').value = characterData.equipmentSlots.hands || '';
+                        document.getElementById('waist').value = characterData.equipmentSlots.waist || '';
+                        document.getElementById('legs').value = characterData.equipmentSlots.legs || '';
+                        document.getElementById('feet').value = characterData.equipmentSlots.feet || '';
+                    }
+                    
+                    // Load other fields
+                    document.getElementById('biteProtection').value = characterData.biteProtection || '';
+                    document.getElementById('shield').value = characterData.shield || '';
+                    document.getElementById('food').value = characterData.food || '';
+                    document.getElementById('water').value = characterData.water || '';
+                    document.getElementById('medicalSupplies').value = characterData.medicalSupplies || '';
+                    document.getElementById('studyMaterials').value = characterData.studyMaterials || '';
+                    document.getElementById('lifeHacks').value = characterData.lifeHacks || '';
+                    document.getElementById('notes').value = characterData.notes || '';
+                    
+                    // Load weapons
+                    if (characterData.weapons && characterData.weapons.length > 0) {
+                        const weapContainer = document.getElementById('weaponsContainer');
+                        weapContainer.innerHTML = '';
+                        characterData.weapons.forEach((weapon, index) => {
+                            const block = document.createElement('div');
+                            block.className = 'weapon-block';
+                            block.innerHTML = `
+                                <button class="remove-weapon" onclick="removeWeapon(this)">×</button>
+                                <div class="weapon-header">${weapon.name || `Weapon ${index + 1}`}</div>
+                                <div class="weapon-field">
+                                    <label>WEAPON NAME</label>
+                                    <input type="text" class="weapon-name" value="${weapon.name || ''}">
+                                </div>
+                                <div class="weapon-field">
+                                    <label>+HIT</label>
+                                    <input type="text" class="weapon-hit" value="${weapon.hit || ''}">
+                                </div>
+                                <div class="weapon-field">
+                                    <label>DAMAGE</label>
+                                    <input type="text" class="weapon-damage" value="${weapon.damage || ''}">
+                                </div>
+                                <div class="weapon-field">
+                                    <label>AMMO</label>
+                                    <input type="text" class="weapon-ammo" value="${weapon.ammo || ''}">
+                                </div>
+                                <div class="weapon-field">
+                                    <label>NOTES</label>
+                                    <input type="text" class="weapon-notes" value="${weapon.notes || ''}">
+                                </div>
+                            `;
+                            weapContainer.appendChild(block);
+                        });
+                    }
+                    
+                    // Load allies
+                    if (characterData.allies && characterData.allies.length > 0) {
+                        const alliesContainer = document.getElementById('alliesContainer');
+                        alliesContainer.innerHTML = '';
+                        characterData.allies.forEach((ally, index) => {
+                            const block = document.createElement('div');
+                            block.className = 'weapon-block';
+                            block.innerHTML = `
+                                <button class="remove-weapon" onclick="removeAlly(this)">×</button>
+                                <div class="weapon-header">${ally.name || `Ally ${index + 1}`}</div>
+                                <div class="weapon-field">
+                                    <label>NAME</label>
+                                    <input type="text" class="ally-name" value="${ally.name || ''}">
+                                </div>
+                                <div class="weapon-field">
+                                    <label>LOCATION</label>
+                                    <input type="text" class="ally-location" value="${ally.location || ''}">
+                                </div>
+                                <div class="weapon-field">
+                                    <label>NOTES</label>
+                                    <input type="text" class="ally-notes" value="${ally.notes || ''}">
+                                </div>
+                            `;
+                            alliesContainer.appendChild(block);
+                        });
+                    }
+                    
+                    // Load contacts
+                    if (characterData.contacts && characterData.contacts.length > 0) {
+                        const contactsContainer = document.getElementById('contactsContainer');
+                        contactsContainer.innerHTML = '';
+                        characterData.contacts.forEach((contact, index) => {
+                            const block = document.createElement('div');
+                            block.className = 'weapon-block';
+                            block.innerHTML = `
+                                <button class="remove-weapon" onclick="removeContact(this)">×</button>
+                                <div class="weapon-header">${contact.name || `Contact ${index + 1}`}</div>
+                                <div class="weapon-field">
+                                    <label>NAME</label>
+                                    <input type="text" class="contact-name" value="${contact.name || ''}">
+                                </div>
+                                <div class="weapon-field">
+                                    <label>LOCATION</label>
+                                    <input type="text" class="contact-location" value="${contact.location || ''}">
+                                </div>
+                                <div class="weapon-field">
+                                    <label>NOTES</label>
+                                    <input type="text" class="contact-notes" value="${contact.notes || ''}">
+                                </div>
+                            `;
+                            contactsContainer.appendChild(block);
+                        });
+                    }
+                    
+                    // Load enemies
+                    if (characterData.enemies && characterData.enemies.length > 0) {
+                        const enemiesContainer = document.getElementById('enemiesContainer');
+                        enemiesContainer.innerHTML = '';
+                        characterData.enemies.forEach((enemy, index) => {
+                            const block = document.createElement('div');
+                            block.className = 'weapon-block';
+                            block.innerHTML = `
+                                <button class="remove-weapon" onclick="removeEnemy(this)">×</button>
+                                <div class="weapon-header">${enemy.name || `Enemy ${index + 1}`}</div>
+                                <div class="weapon-field">
+                                    <label>NAME</label>
+                                    <input type="text" class="enemy-name" value="${enemy.name || ''}">
+                                </div>
+                                <div class="weapon-field">
+                                    <label>LOCATION</label>
+                                    <input type="text" class="enemy-location" value="${enemy.location || ''}">
+                                </div>
+                                <div class="weapon-field">
+                                    <label>NOTES</label>
+                                    <input type="text" class="enemy-notes" value="${enemy.notes || ''}">
+                                </div>
+                            `;
+                            enemiesContainer.appendChild(block);
+                        });
+                    }
+                    
+                    // Update calculations
+                    if (typeof updateStatModifiers === 'function') updateStatModifiers();
+                    if (typeof updateWeaponStats === 'function') updateWeaponStats();
+                    
+                    alert('Character loaded successfully!\n\nName: ' + characterData.name + '\nHP: ' + characterData.hp + '\nAC: ' + characterData.ac + '\nWeapons: ' + (characterData.weapons?.length || 0) + '\nAllies: ' + (characterData.allies?.length || 0));
                 } catch (error) {
                     alert('Error loading character: ' + error.message);
                 }
