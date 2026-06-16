@@ -648,14 +648,14 @@
                         <label for="weaponType">WEAPON TYPE:</label>
                         <select id="weaponType" onchange="updateWeaponStats()">
                             <option value="">Select weapon...</option>
-                            <option value="melee-light">Light Melee (Dagger, Club)</option>
-                            <option value="melee-simple">Simple Melee (Staff, Mace)</option>
-                            <option value="melee-martial">Martial Melee (Sword, Axe)</option>
-                            <option value="melee-heavy">Heavy Melee (Greatsword, Maul)</option>
-                            <option value="ranged-light">Light Ranged (Sling, Pistol)</option>
-                            <option value="ranged-simple">Simple Ranged (Shortbow)</option>
-                            <option value="ranged-martial">Martial Ranged (Longbow, Rifle)</option>
-                            <option value="ranged-heavy">Heavy Ranged (Shotgun, Sniper)</option>
+                            <option value="melee-light">Light Melee (Crowbar, Baseball Bat)</option>
+                            <option value="melee-simple">Simple Melee (Knife, Hammer)</option>
+                            <option value="melee-martial">Martial Melee (Machete, Axe)</option>
+                            <option value="melee-heavy">Heavy Melee (Sledgehammer, Fire Axe)</option>
+                            <option value="ranged-light">Light Ranged (Pistol, Revolver)</option>
+                            <option value="ranged-simple">Simple Ranged (Crossbow, Thrown)</option>
+                            <option value="ranged-martial">Martial Ranged (Rifle, Shotgun)</option>
+                            <option value="ranged-heavy">Heavy Ranged (Sniper Rifle, Assault Rifle)</option>
                             <option value="custom">Custom Weapon</option>
                         </select>
                     </div>
@@ -816,23 +816,25 @@
 
         <div class="section">
             <h2>ALLIES & CONTACTS</h2>
-            <table id="alliesTable">
-                <thead>
-                    <tr>
-                        <th>NAME</th>
-                        <th>LOCATION</th>
-                        <th>NOTES</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><input type="text" class="ally-name"></td>
-                        <td><input type="text" class="ally-location"></td>
-                        <td><input type="text" class="ally-notes"></td>
-                    </tr>
-                </tbody>
-            </table>
-            <button onclick="addAllyRow()">Add Ally</button>
+            <div class="weapons-container" id="alliesContainer">
+                <div class="weapon-block">
+                    <button class="remove-weapon" onclick="removeAlly(this)">×</button>
+                    <div class="weapon-header">Ally 1</div>
+                    <div class="weapon-field">
+                        <label>NAME</label>
+                        <input type="text" class="ally-name" placeholder="Enter ally name">
+                    </div>
+                    <div class="weapon-field">
+                        <label>LOCATION</label>
+                        <input type="text" class="ally-location" placeholder="Where to find them">
+                    </div>
+                    <div class="weapon-field">
+                        <label>NOTES</label>
+                        <input type="text" class="ally-notes" placeholder="Relationship, skills, etc.">
+                    </div>
+                </div>
+            </div>
+            <button onclick="addAllyBlock()">Add Ally</button>
         </div>
 
         <div class="section">
@@ -1234,22 +1236,22 @@
             });
 
             // Save weapons
-            document.querySelectorAll('#weaponsTable tbody tr').forEach(row => {
+            document.querySelectorAll('#weaponsContainer .weapon-block').forEach(block => {
                 characterData.weapons.push({
-                    name: row.querySelector('.weapon-name').value,
-                    hit: row.querySelector('.weapon-hit').value,
-                    damage: row.querySelector('.weapon-damage').value,
-                    ammo: row.querySelector('.weapon-ammo').value,
-                    notes: row.querySelector('.weapon-notes').value
+                    name: block.querySelector('.weapon-name').value,
+                    hit: block.querySelector('.weapon-hit').value,
+                    damage: block.querySelector('.weapon-damage').value,
+                    ammo: block.querySelector('.weapon-ammo').value,
+                    notes: block.querySelector('.weapon-notes').value
                 });
             });
 
             // Save allies
-            document.querySelectorAll('#alliesTable tbody tr').forEach(row => {
+            document.querySelectorAll('#alliesContainer .weapon-block').forEach(block => {
                 characterData.allies.push({
-                    name: row.querySelector('.ally-name').value,
-                    location: row.querySelector('.ally-location').value,
-                    notes: row.querySelector('.ally-notes').value
+                    name: block.querySelector('.ally-name').value,
+                    location: block.querySelector('.ally-location').value,
+                    notes: block.querySelector('.ally-notes').value
                 });
             });
 
@@ -1369,40 +1371,70 @@
                         addProfessionRow(); // Add empty row if no professions
                     }
 
-                    // Clear and reload weapons table
-                    const weapTbody = document.querySelector('#weaponsTable tbody');
-                    weapTbody.innerHTML = '';
+                    // Clear and reload weapons blocks
+                    const weapContainer = document.getElementById('weaponsContainer');
+                    weapContainer.innerHTML = '';
                     if (characterData.weapons && characterData.weapons.length > 0) {
-                        characterData.weapons.forEach(weapon => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td><input type="text" class="weapon-name" value="${weapon.name || ''}"></td>
-                                <td><input type="text" class="weapon-hit" value="${weapon.hit || ''}"></td>
-                                <td><input type="text" class="weapon-damage" value="${weapon.damage || ''}"></td>
-                                <td><input type="text" class="weapon-ammo" value="${weapon.ammo || ''}"></td>
-                                <td><input type="text" class="weapon-notes" value="${weapon.notes || ''}"></td>
+                        characterData.weapons.forEach((weapon, index) => {
+                            const block = document.createElement('div');
+                            block.className = 'weapon-block';
+                            block.innerHTML = `
+                                <button class="remove-weapon" onclick="removeWeapon(this)">×</button>
+                                <div class="weapon-header">${weapon.name || `Weapon ${index + 1}`}</div>
+                                <div class="weapon-field">
+                                    <label>WEAPON NAME</label>
+                                    <input type="text" class="weapon-name" value="${weapon.name || ''}">
+                                </div>
+                                <div class="weapon-field">
+                                    <label>+HIT</label>
+                                    <input type="text" class="weapon-hit" value="${weapon.hit || ''}">
+                                </div>
+                                <div class="weapon-field">
+                                    <label>DAMAGE</label>
+                                    <input type="text" class="weapon-damage" value="${weapon.damage || ''}">
+                                </div>
+                                <div class="weapon-field">
+                                    <label>AMMO</label>
+                                    <input type="text" class="weapon-ammo" value="${weapon.ammo || ''}">
+                                </div>
+                                <div class="weapon-field">
+                                    <label>NOTES</label>
+                                    <input type="text" class="weapon-notes" value="${weapon.notes || ''}">
+                                </div>
                             `;
-                            weapTbody.appendChild(row);
+                            weapContainer.appendChild(block);
                         });
                     } else {
-                        addWeaponRow(); // Add empty row if no weapons
+                        addWeaponBlock(); // Add empty block if no weapons
                     }
 
-                    // Clear and reload allies table
-                    const alliesTbody = document.querySelector('#alliesTable tbody');
-                    alliesTbody.innerHTML = '';
+                    // Clear and reload allies blocks
+                    const alliesContainer = document.getElementById('alliesContainer');
+                    alliesContainer.innerHTML = '';
                     if (characterData.allies && characterData.allies.length > 0) {
-                        characterData.allies.forEach(ally => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td><input type="text" class="ally-name" value="${ally.name || ''}"></td>
-                                <td><input type="text" class="ally-location" value="${ally.location || ''}"></td>
-                                <td><input type="text" class="ally-notes" value="${ally.notes || ''}"></td>
+                        characterData.allies.forEach((ally, index) => {
+                            const block = document.createElement('div');
+                            block.className = 'weapon-block';
+                            block.innerHTML = `
+                                <button class="remove-weapon" onclick="removeAlly(this)">×</button>
+                                <div class="weapon-header">${ally.name || `Ally ${index + 1}`}</div>
+                                <div class="weapon-field">
+                                    <label>NAME</label>
+                                    <input type="text" class="ally-name" value="${ally.name || ''}">
+                                </div>
+                                <div class="weapon-field">
+                                    <label>LOCATION</label>
+                                    <input type="text" class="ally-location" value="${ally.location || ''}">
+                                </div>
+                                <div class="weapon-field">
+                                    <label>NOTES</label>
+                                    <input type="text" class="ally-notes" value="${ally.notes || ''}">
+                                </div>
                             `;
-                            alliesTbody.appendChild(row);
+                            alliesContainer.appendChild(block);
                         });
                     } else {
-                        addAllyRow(); // Add empty row if no allies
+                        addAllyBlock(); // Add empty block if no allies
                     }
 
                     updateStatModifiers(); // Recalculate modifiers after loading
@@ -1605,6 +1637,34 @@
         }
         
         function removeWeapon(button) {
+            button.parentElement.remove();
+        }
+        
+        function addAllyBlock() {
+            const container = document.getElementById('alliesContainer');
+            const allyCount = container.children.length + 1;
+            const block = document.createElement('div');
+            block.className = 'weapon-block';
+            block.innerHTML = `
+                <button class="remove-weapon" onclick="removeAlly(this)">×</button>
+                <div class="weapon-header">Ally ${allyCount}</div>
+                <div class="weapon-field">
+                    <label>NAME</label>
+                    <input type="text" class="ally-name" placeholder="Enter ally name">
+                </div>
+                <div class="weapon-field">
+                    <label>LOCATION</label>
+                    <input type="text" class="ally-location" placeholder="Where to find them">
+                </div>
+                <div class="weapon-field">
+                    <label>NOTES</label>
+                    <input type="text" class="ally-notes" placeholder="Relationship, skills, etc.">
+                </div>
+            `;
+            container.appendChild(block);
+        }
+        
+        function removeAlly(button) {
             button.parentElement.remove();
         }
 
