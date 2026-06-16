@@ -1,8 +1,8 @@
 const CACHE_NAME = 'dead-world-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json'
+  '/Dead-World-RPG-Character-Sheet/',
+  '/Dead-World-RPG-Character-Sheet/index.html',
+  '/Dead-World-RPG-Character-Sheet/manifest.json'
 ];
 
 // Install Service Worker
