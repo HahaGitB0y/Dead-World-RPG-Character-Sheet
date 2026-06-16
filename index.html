@@ -471,12 +471,10 @@
         <h1>DEAD WORLD CHARACTER SHEET</h1>
         
         <div class="button-group">
-            <button onclick="manualSave()">💾 Save Now</button>
-            <button onclick="loadCharacter()">Load Character</button>
-            <button onclick="exportCharacter()">Export Character</button>
-            <button onclick="document.getElementById('importFile').click()">Import Character</button>
-            <button onclick="clearCharacter()">Clear All</button>
-            <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importCharacter(event)">
+            <button onclick="saveCharacterToFile()">💾 Save Character</button>
+            <button onclick="document.getElementById('loadFile').click()">📁 Load Character</button>
+            <button onclick="clearCharacter()">🗑️ Clear All</button>
+            <input type="file" id="loadFile" accept=".json" style="display: none;" onchange="loadCharacterFromFile(event)">
         </div>
 
         <div class="section">
@@ -1408,6 +1406,352 @@
             alert('Character saved successfully!');
         }
 
+        // Get character data
+        function getCharacterData() {
+            const characterData = {
+                name: document.getElementById('name').value,
+                age: document.getElementById('age').value,
+                gender: document.getElementById('gender').value,
+                background: document.getElementById('background').value,
+                startingProfession: document.getElementById('startingProfession').value,
+                currentProfessions: document.getElementById('currentProfessions').value,
+                stats: {
+                    str: document.getElementById('str').value,
+                    dex: document.getElementById('dex').value,
+                    con: document.getElementById('con').value,
+                    int: document.getElementById('int').value,
+                    wis: document.getElementById('wis').value,
+                    cha: document.getElementById('cha').value
+                },
+                hp: document.getElementById('hp').value,
+                ac: document.getElementById('ac').value,
+                speed: document.getElementById('speed').value,
+                initiative: document.getElementById('initiative').value,
+                proficiency: document.getElementById('proficiency').value,
+                stress: document.querySelector('[data-stress].active')?.dataset.stress || '0',
+                infection: document.querySelector('[data-infection].active')?.dataset.infection || 'clean',
+                exhaustion: document.querySelector('[data-exhaustion].active')?.dataset.exhaustion || '0',
+                savingThrows: {
+                    str: document.getElementById('saveStr').checked,
+                    dex: document.getElementById('saveDex').checked,
+                    con: document.getElementById('saveCon').checked,
+                    int: document.getElementById('saveInt').checked,
+                    wis: document.getElementById('saveWis').checked,
+                    cha: document.getElementById('saveCha').checked
+                },
+                skills: [],
+                professions: [],
+                weapons: [],
+                equipment: [],
+                allies: [],
+                contacts: [],
+                enemies: [],
+                equipmentSlots: {
+                    head: document.getElementById('head').value,
+                    neck: document.getElementById('neck').value,
+                    body: document.getElementById('body').value,
+                    back: document.getElementById('back').value,
+                    hands: document.getElementById('hands').value,
+                    waist: document.getElementById('waist').value,
+                    legs: document.getElementById('legs').value,
+                    feet: document.getElementById('feet').value
+                },
+                biteProtection: document.getElementById('biteProtection').value,
+                shield: document.getElementById('shield').value,
+                food: document.getElementById('food').value,
+                water: document.getElementById('water').value,
+                medicalSupplies: document.getElementById('medicalSupplies').value,
+                studyMaterials: document.getElementById('studyMaterials').value,
+                lifeHacks: document.getElementById('lifeHacks').value,
+                notes: document.getElementById('notes').value,
+                saveDate: new Date().toISOString(),
+                version: "1.0"
+            };
+
+            // Save skills
+            skills.forEach(skill => {
+                const modifier = document.querySelector(`.skill-modifier`).value;
+                const proficiency = document.querySelector(`input[name="prof-${skill.name}"]:checked`)?.value || 'none';
+                characterData.skills.push({ name: skill.name, modifier, proficiency });
+            });
+
+            // Save professions
+            document.querySelectorAll('#professionsTable tbody tr').forEach(row => {
+                characterData.professions.push({
+                    name: row.querySelector('.profession-name').value,
+                    level: row.querySelector('.profession-level').value,
+                    xp: row.querySelector('.profession-xp').value,
+                    next: row.querySelector('.profession-next').value
+                });
+            });
+
+            // Save weapons
+            document.querySelectorAll('#weaponsContainer .weapon-block').forEach(block => {
+                characterData.weapons.push({
+                    name: block.querySelector('.weapon-name').value,
+                    hit: block.querySelector('.weapon-hit').value,
+                    damage: block.querySelector('.weapon-damage').value,
+                    ammo: block.querySelector('.weapon-ammo').value,
+                    notes: block.querySelector('.weapon-notes').value
+                });
+            });
+
+            // Save allies
+            document.querySelectorAll('#alliesContainer .weapon-block').forEach(block => {
+                characterData.allies.push({
+                    name: block.querySelector('.ally-name').value,
+                    location: block.querySelector('.ally-location').value,
+                    notes: block.querySelector('.ally-notes').value
+                });
+            });
+
+            // Save contacts
+            document.querySelectorAll('#contactsContainer .weapon-block').forEach(block => {
+                characterData.contacts.push({
+                    name: block.querySelector('.contact-name').value,
+                    location: block.querySelector('.contact-location').value,
+                    notes: block.querySelector('.contact-notes').value
+                });
+            });
+
+            // Save enemies
+            document.querySelectorAll('#enemiesContainer .weapon-block').forEach(block => {
+                characterData.enemies.push({
+                    name: block.querySelector('.enemy-name').value,
+                    location: block.querySelector('.enemy-location').value,
+                    notes: block.querySelector('.enemy-notes').value
+                });
+            });
+
+            return characterData;
+        }
+
+        // Save character to file
+        function saveCharacterToFile() {
+            try {
+                const characterData = getCharacterData();
+                const dataStr = JSON.stringify(characterData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${characterData.name || 'Character'}_DeadWorld.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                alert('Character saved to device!');
+            } catch (error) {
+                alert('Error saving character: ' + error.message);
+            }
+        }
+
+        // Load character from file
+        function loadCharacterFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const characterData = JSON.parse(e.target.result);
+                    loadCharacterData(characterData);
+                    alert('Character loaded successfully!');
+                } catch (error) {
+                    alert('Error loading character: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset file input
+            event.target.value = '';
+        }
+
+        // Load character data into form
+        function loadCharacterData(characterData) {
+            // Load basic info
+            document.getElementById('name').value = characterData.name || '';
+            document.getElementById('age').value = characterData.age || '';
+            document.getElementById('gender').value = characterData.gender || '';
+            document.getElementById('background').value = characterData.background || '';
+            document.getElementById('startingProfession').value = characterData.startingProfession || '';
+            document.getElementById('currentProfessions').value = characterData.currentProfessions || '';
+
+            // Load stats
+            if (characterData.stats) {
+                document.getElementById('str').value = characterData.stats.str || '';
+                document.getElementById('dex').value = characterData.stats.dex || '';
+                document.getElementById('con').value = characterData.stats.con || '';
+                document.getElementById('int').value = characterData.stats.int || '';
+                document.getElementById('wis').value = characterData.stats.wis || '';
+                document.getElementById('cha').value = characterData.stats.cha || '';
+            }
+
+            // Load combat stats
+            document.getElementById('hp').value = characterData.hp || '';
+            document.getElementById('ac').value = characterData.ac || '';
+            document.getElementById('speed').value = characterData.speed || '';
+            document.getElementById('initiative').value = characterData.initiative || '';
+            document.getElementById('proficiency').value = characterData.proficiency || '';
+
+            // Load status trackers
+            if (characterData.stress) {
+                const stressOption = document.querySelector(`[data-stress="${characterData.stress}"]`);
+                if (stressOption) stressOption.click();
+            }
+            if (characterData.infection) {
+                const infectionOption = document.querySelector(`[data-infection="${characterData.infection}"]`);
+                if (infectionOption) infectionOption.click();
+            }
+            if (characterData.exhaustion) {
+                const exhaustionOption = document.querySelector(`[data-exhaustion="${characterData.exhaustion}"]`);
+                if (exhaustionOption) exhaustionOption.click();
+            }
+
+            // Load equipment slots
+            if (characterData.equipmentSlots) {
+                document.getElementById('head').value = characterData.equipmentSlots.head || '';
+                document.getElementById('neck').value = characterData.equipmentSlots.neck || '';
+                document.getElementById('body').value = characterData.equipmentSlots.body || '';
+                document.getElementById('back').value = characterData.equipmentSlots.back || '';
+                document.getElementById('hands').value = characterData.equipmentSlots.hands || '';
+                document.getElementById('waist').value = characterData.equipmentSlots.waist || '';
+                document.getElementById('legs').value = characterData.equipmentSlots.legs || '';
+                document.getElementById('feet').value = characterData.equipmentSlots.feet || '';
+            }
+
+            // Load other fields
+            document.getElementById('biteProtection').value = characterData.biteProtection || '';
+            document.getElementById('shield').value = characterData.shield || '';
+            document.getElementById('food').value = characterData.food || '';
+            document.getElementById('water').value = characterData.water || '';
+            document.getElementById('medicalSupplies').value = characterData.medicalSupplies || '';
+            document.getElementById('studyMaterials').value = characterData.studyMaterials || '';
+            document.getElementById('lifeHacks').value = characterData.lifeHacks || '';
+            document.getElementById('notes').value = characterData.notes || '';
+
+            // Load weapons
+            if (characterData.weapons && characterData.weapons.length > 0) {
+                const weapContainer = document.getElementById('weaponsContainer');
+                weapContainer.innerHTML = '';
+                characterData.weapons.forEach((weapon, index) => {
+                    const block = document.createElement('div');
+                    block.className = 'weapon-block';
+                    block.innerHTML = `
+                        <button class="remove-weapon" onclick="removeWeapon(this)">×</button>
+                        <div class="weapon-header">${weapon.name || `Weapon ${index + 1}`}</div>
+                        <div class="weapon-field">
+                            <label>WEAPON NAME</label>
+                            <input type="text" class="weapon-name" value="${weapon.name || ''}">
+                        </div>
+                        <div class="weapon-field">
+                            <label>+HIT</label>
+                            <input type="text" class="weapon-hit" value="${weapon.hit || ''}">
+                        </div>
+                        <div class="weapon-field">
+                            <label>DAMAGE</label>
+                            <input type="text" class="weapon-damage" value="${weapon.damage || ''}">
+                        </div>
+                        <div class="weapon-field">
+                            <label>AMMO</label>
+                            <input type="text" class="weapon-ammo" value="${weapon.ammo || ''}">
+                        </div>
+                        <div class="weapon-field">
+                            <label>NOTES</label>
+                            <input type="text" class="weapon-notes" value="${weapon.notes || ''}">
+                        </div>
+                    `;
+                    weapContainer.appendChild(block);
+                });
+            }
+
+            // Load allies
+            if (characterData.allies && characterData.allies.length > 0) {
+                const alliesContainer = document.getElementById('alliesContainer');
+                alliesContainer.innerHTML = '';
+                characterData.allies.forEach((ally, index) => {
+                    const block = document.createElement('div');
+                    block.className = 'weapon-block';
+                    block.innerHTML = `
+                        <button class="remove-weapon" onclick="removeAlly(this)">×</button>
+                        <div class="weapon-header">${ally.name || `Ally ${index + 1}`}</div>
+                        <div class="weapon-field">
+                            <label>NAME</label>
+                            <input type="text" class="ally-name" value="${ally.name || ''}">
+                        </div>
+                        <div class="weapon-field">
+                            <label>LOCATION</label>
+                            <input type="text" class="ally-location" value="${ally.location || ''}">
+                        </div>
+                        <div class="weapon-field">
+                            <label>NOTES</label>
+                            <input type="text" class="ally-notes" value="${ally.notes || ''}">
+                        </div>
+                    `;
+                    alliesContainer.appendChild(block);
+                });
+            }
+
+            // Load contacts
+            if (characterData.contacts && characterData.contacts.length > 0) {
+                const contactsContainer = document.getElementById('contactsContainer');
+                contactsContainer.innerHTML = '';
+                characterData.contacts.forEach((contact, index) => {
+                    const block = document.createElement('div');
+                    block.className = 'weapon-block';
+                    block.innerHTML = `
+                        <button class="remove-weapon" onclick="removeContact(this)">×</button>
+                        <div class="weapon-header">${contact.name || `Contact ${index + 1}`}</div>
+                        <div class="weapon-field">
+                            <label>NAME</label>
+                            <input type="text" class="contact-name" value="${contact.name || ''}">
+                        </div>
+                        <div class="weapon-field">
+                            <label>LOCATION</label>
+                            <input type="text" class="contact-location" value="${contact.location || ''}">
+                        </div>
+                        <div class="weapon-field">
+                            <label>NOTES</label>
+                            <input type="text" class="contact-notes" value="${contact.notes || ''}">
+                        </div>
+                    `;
+                    contactsContainer.appendChild(block);
+                });
+            }
+
+            // Load enemies
+            if (characterData.enemies && characterData.enemies.length > 0) {
+                const enemiesContainer = document.getElementById('enemiesContainer');
+                enemiesContainer.innerHTML = '';
+                characterData.enemies.forEach((enemy, index) => {
+                    const block = document.createElement('div');
+                    block.className = 'weapon-block';
+                    block.innerHTML = `
+                        <button class="remove-weapon" onclick="removeEnemy(this)">×</button>
+                        <div class="weapon-header">${enemy.name || `Enemy ${index + 1}`}</div>
+                        <div class="weapon-field">
+                            <label>NAME</label>
+                            <input type="text" class="enemy-name" value="${enemy.name || ''}">
+                        </div>
+                        <div class="weapon-field">
+                            <label>LOCATION</label>
+                            <input type="text" class="enemy-location" value="${enemy.location || ''}">
+                        </div>
+                        <div class="weapon-field">
+                            <label>NOTES</label>
+                            <input type="text" class="enemy-notes" value="${enemy.notes || ''}">
+                        </div>
+                    `;
+                    enemiesContainer.appendChild(block);
+                });
+            }
+
+            // Update calculations
+            updateStatModifiers();
+            updateWeaponStats();
+        }
+
         // Load character from localStorage
         function loadCharacter() {
             console.log('Attempting to load character data...');
@@ -2173,33 +2517,15 @@
             }
         }
 
-        // Robust auto-save functionality
+        // Auto-save functionality using file system
         function autoSave() {
             try {
-                saveCharacter();
+                const characterData = getCharacterData();
+                // Save to localStorage as backup
+                localStorage.setItem('deadWorldCharacter', JSON.stringify(characterData));
                 console.log('Auto-save completed successfully');
             } catch (error) {
                 console.error('Auto-save failed:', error);
-                // Fallback: try to save critical data only
-                try {
-                    const criticalData = {
-                        name: document.getElementById('name').value,
-                        stats: {
-                            str: document.getElementById('str').value,
-                            dex: document.getElementById('dex').value,
-                            con: document.getElementById('con').value,
-                            int: document.getElementById('int').value,
-                            wis: document.getElementById('wis').value,
-                            cha: document.getElementById('cha').value
-                        },
-                        hp: document.getElementById('hp').value,
-                        ac: document.getElementById('ac').value
-                    };
-                    localStorage.setItem('deadWorldCharacterCritical', JSON.stringify(criticalData));
-                    console.log('Critical data saved as fallback');
-                } catch (fallbackError) {
-                    console.error('Fallback save also failed:', fallbackError);
-                }
             }
         }
 
@@ -2221,10 +2547,9 @@
             });
         }
 
-        // Manual save button for testing
+        // Manual save button
         function manualSave() {
-            autoSave();
-            alert('Character saved manually! Check console for details.');
+            saveCharacterToFile();
         }
 
         // Initialize everything when page loads
