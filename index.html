@@ -1068,26 +1068,32 @@
             <div class="stats-grid">
                 <div class="save-box">
                     <label>STR</label>
+                    <input type="checkbox" id="saveStr" onchange="updateStatModifiers()">
                     <div class="save-modifier" id="strSave">+0</div>
                 </div>
                 <div class="save-box">
                     <label>DEX</label>
+                    <input type="checkbox" id="saveDex" onchange="updateStatModifiers()">
                     <div class="save-modifier" id="dexSave">+0</div>
                 </div>
                 <div class="save-box">
                     <label>CON</label>
+                    <input type="checkbox" id="saveCon" onchange="updateStatModifiers()">
                     <div class="save-modifier" id="conSave">+0</div>
                 </div>
                 <div class="save-box">
                     <label>INT</label>
+                    <input type="checkbox" id="saveInt" onchange="updateStatModifiers()">
                     <div class="save-modifier" id="intSave">+0</div>
                 </div>
                 <div class="save-box">
                     <label>WIS</label>
+                    <input type="checkbox" id="saveWis" onchange="updateStatModifiers()">
                     <div class="save-modifier" id="wisSave">+0</div>
                 </div>
                 <div class="save-box">
                     <label>CHA</label>
+                    <input type="checkbox" id="saveCha" onchange="updateStatModifiers()">
                     <div class="save-modifier" id="chaSave">+0</div>
                 </div>
             </div>
@@ -2999,7 +3005,8 @@
             stats.forEach(stat => {
                 const statValue = document.getElementById(stat).value;
                 const baseModifier = getStatModifier(statValue);
-                const totalModifier = baseModifier + disadvantage;
+                const isProficient = document.getElementById('save' + stat.charAt(0).toUpperCase() + stat.slice(1))?.checked || false;
+                const totalModifier = baseModifier + (isProficient ? proficiency : 0) + disadvantage;
                 document.getElementById(stat + 'Save').textContent = (totalModifier >= 0 ? '+' : '') + totalModifier;
             });
         }
