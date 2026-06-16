@@ -220,13 +220,14 @@
         
         .button-group {
             display: flex;
-            gap: 10px;
+            gap: 5px;
             margin: 20px 0;
             justify-content: center;
+            flex-wrap: wrap;
         }
         
         button {
-            padding: 10px 20px;
+            padding: 8px 12px;
             background: #4ecdc4;
             color: #000;
             border: none;
@@ -234,11 +235,14 @@
             cursor: pointer;
             font-weight: bold;
             transition: all 0.2s;
+            font-size: 12px;
+            white-space: nowrap;
+            min-width: 0;
         }
         
         button:hover {
             background: #3db8af;
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
         
         .equipment-list {
@@ -279,6 +283,18 @@
             
             .status-trackers {
                 flex-direction: column;
+            }
+            
+            .button-group {
+                gap: 3px;
+                margin: 15px 0;
+            }
+            
+            button {
+                padding: 6px 8px;
+                font-size: 11px;
+                flex: 1;
+                min-width: 0;
             }
         }
     </style>
