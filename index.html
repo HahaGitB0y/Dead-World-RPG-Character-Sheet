@@ -471,8 +471,9 @@
         <h1>DEAD WORLD CHARACTER SHEET</h1>
         
         <div class="button-group">
-            <button onclick="saveCharacterToFile()">💾 Save Character</button>
-            <button onclick="document.getElementById('loadFile').click()">📁 Load Character</button>
+            <button onclick="saveCharacterToFile()">📋 Copy Character Data</button>
+            <button onclick="document.getElementById('loadFile').click()">📁 Load from File</button>
+            <button onclick="loadFromClipboard()">📋 Load from Clipboard</button>
             <button onclick="clearCharacter()">🗑️ Clear All</button>
             <input type="file" id="loadFile" accept=".json" style="display: none;" onchange="loadCharacterFromFile(event)">
         </div>
@@ -1526,35 +1527,167 @@
             return characterData;
         }
 
-        // Save character to file
+        // Save character to clipboard
         function saveCharacterToFile() {
             console.log('Save button clicked!');
             try {
-                // Test basic functionality first
-                const testData = {
-                    name: document.getElementById('name').value || 'Test Character',
-                    test: 'This is a test save',
-                    timestamp: new Date().toISOString()
-                };
+                const characterData = getCharacterData();
+                const dataStr = JSON.stringify(characterData, null, 2);
                 
-                console.log('Creating file with data:', testData);
-                
-                const dataStr = JSON.stringify(testData, null, 2);
-                const dataBlob = new Blob([dataStr], { type: 'application/json' });
-                const url = URL.createObjectURL(dataBlob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `${testData.name}_Test.json`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-                
-                console.log('File download triggered');
-                alert('Test character saved to device!');
+                // Try to save to clipboard
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(dataStr).then(() => {
+                        alert('Character data copied to clipboard!\n\nPaste this into a notes app or text editor to save it.\n\nData includes: ' + characterData.name);
+                    }).catch(err => {
+                        console.error('Clipboard failed:', err);
+                        fallbackSave(dataStr, characterData);
+                    });
+                } else {
+                    fallbackSave(dataStr, characterData);
+                }
             } catch (error) {
                 console.error('Save error:', error);
                 alert('Error saving character: ' + error.message);
+            }
+        }
+
+        // Fallback save method
+        function fallbackSave(dataStr, characterData) {
+            // Create a text area and display the data
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                box-sizing: border-box;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: #2a2a2a;
+                color: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                max-width: 90%;
+                max-height: 80%;
+                overflow-y: auto;
+                position: relative;
+            `;
+            
+            content.innerHTML = `
+                <h3 style="margin-top: 0; color: #4ecdc4;">Character Data for ${characterData.name}</h3>
+                <p style="color: #ccc; font-size: 14px;">Select all text below, copy it, and save it in a notes app:</p>
+                <textarea readonly style="width: 100%; height: 300px; background: #1a1a1a; color: #fff; border: 1px solid #555; padding: 10px; font-family: monospace; font-size: 12px; border-radius: 5px;">${dataStr}</textarea>
+                <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 10px; background: #4ecdc4; color: #000; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">Close</button>
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            // Auto-select the text
+            const textarea = content.querySelector('textarea');
+            textarea.focus();
+            textarea.select();
+            
+            // Try to copy automatically
+            try {
+                document.execCommand('copy');
+                alert('Character data copied to clipboard! (If not, select and copy manually)');
+            } catch (err) {
+                console.log('Auto-copy failed, user must copy manually');
+            }
+        }
+
+        // Load character from clipboard
+        function loadFromClipboard() {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.readText().then(text => {
+                    try {
+                        const characterData = JSON.parse(text);
+                        loadCharacterData(characterData);
+                        alert('Character loaded from clipboard!');
+                    } catch (error) {
+                        alert('Invalid character data in clipboard: ' + error.message);
+                    }
+                }).catch(err => {
+                    console.error('Clipboard read failed:', err);
+                    fallbackLoad();
+                });
+            } else {
+                fallbackLoad();
+            }
+        }
+
+        // Fallback load method
+        function fallbackLoad() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                box-sizing: border-box;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: #2a2a2a;
+                color: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                max-width: 90%;
+                max-height: 80%;
+                overflow-y: auto;
+                position: relative;
+            `;
+            
+            content.innerHTML = `
+                <h3 style="margin-top: 0; color: #4ecdc4;">Load Character Data</h3>
+                <p style="color: #ccc; font-size: 14px;">Paste your character data below:</p>
+                <textarea id="characterDataInput" style="width: 100%; height: 300px; background: #1a1a1a; color: #fff; border: 1px solid #555; padding: 10px; font-family: monospace; font-size: 12px; border-radius: 5px;" placeholder="Paste character JSON data here..."></textarea>
+                <div style="margin-top: 10px;">
+                    <button onclick="loadFromText()" style="background: #4ecdc4; color: #000; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 10px;">Load Character</button>
+                    <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: #666; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Cancel</button>
+                </div>
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            // Focus on textarea
+            document.getElementById('characterDataInput').focus();
+        }
+
+        // Load character from text input
+        function loadFromText() {
+            const text = document.getElementById('characterDataInput').value;
+            if (!text.trim()) {
+                alert('Please paste character data first');
+                return;
+            }
+            
+            try {
+                const characterData = JSON.parse(text);
+                loadCharacterData(characterData);
+                document.querySelector('[style*="position: fixed"]').remove(); // Close modal
+                alert('Character loaded successfully!');
+            } catch (error) {
+                alert('Invalid character data: ' + error.message);
             }
         }
 
