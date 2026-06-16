@@ -1528,34 +1528,26 @@
             return characterData;
         }
 
-        // Save character to file using multiple methods
+        // Simple test save function
         function saveCharacterToFile() {
-            console.log('Save button clicked!');
+            alert('Save button clicked! JavaScript is working.');
+            
+            // Get basic character data
+            const name = document.getElementById('name').value || 'Test Character';
+            const testData = {
+                name: name,
+                hp: document.getElementById('hp').value || '10',
+                ac: document.getElementById('ac').value || '10',
+                test: 'This is a test save',
+                timestamp: new Date().toISOString()
+            };
+            
+            // Try localStorage first (most reliable)
             try {
-                const characterData = getCharacterData();
-                const dataStr = JSON.stringify(characterData, null, 2);
-                const fileName = `${characterData.name || 'Character'}_DeadWorld.json`;
-                
-                // Method 1: Try Web Share API (iOS 13+)
-                if (navigator.share && window.isSecureContext) {
-                    const file = new File([dataStr], fileName, { type: 'application/json' });
-                    navigator.share({
-                        title: 'Dead World Character',
-                        text: `Character sheet for ${characterData.name}`,
-                        files: [file]
-                    }).then(() => {
-                        console.log('Character shared successfully');
-                    }).catch(err => {
-                        console.log('Web Share failed, trying download:', err);
-                        tryFileDownload(dataStr, fileName);
-                    });
-                } else {
-                    // Method 2: Try direct download
-                    tryFileDownload(dataStr, fileName);
-                }
+                localStorage.setItem('deadWorldCharacterTest', JSON.stringify(testData));
+                alert('Character saved to device storage!\n\nName: ' + testData.name + '\nHP: ' + testData.hp + '\nAC: ' + testData.ac);
             } catch (error) {
-                console.error('Save error:', error);
-                alert('Error saving character: ' + error.message);
+                alert('localStorage not available: ' + error.message);
             }
         }
 
@@ -1701,59 +1693,43 @@
             });
         }
 
-        // Save character to IndexedDB
-        async function saveToLocal() {
+        // Simple save to localStorage
+        function saveToLocal() {
             try {
-                await initDB();
-                const characterData = getCharacterData();
-                const characterId = characterData.name || 'Character';
-                
-                const transaction = db.transaction([storeName], 'readwrite');
-                const store = transaction.objectStore(storeName);
-                
-                const saveData = {
-                    id: characterId,
-                    data: characterData,
+                const name = document.getElementById('name').value || 'Test Character';
+                const characterData = {
+                    name: name,
+                    hp: document.getElementById('hp').value || '10',
+                    ac: document.getElementById('ac').value || '10',
                     timestamp: new Date().toISOString()
                 };
                 
-                await store.put(saveData);
-                alert('Character saved to device storage!\n\nUse "Load from Device" to restore it.');
+                localStorage.setItem('deadWorldCharacter', JSON.stringify(characterData));
+                alert('Character saved to device storage!\n\nName: ' + characterData.name + '\nHP: ' + characterData.hp + '\nAC: ' + characterData.ac);
                 
             } catch (error) {
-                console.error('IndexedDB save failed:', error);
-                alert('Device storage not available. Use regular Save button instead.');
+                alert('Device storage not available: ' + error.message);
             }
         }
 
-        // Load character from IndexedDB
-        async function loadFromLocal() {
+        // Simple load from localStorage
+        function loadFromLocal() {
             try {
-                await initDB();
+                const savedData = localStorage.getItem('deadWorldCharacter');
+                if (!savedData) {
+                    alert('No saved character found on device.');
+                    return;
+                }
                 
-                const transaction = db.transaction([storeName], 'readonly');
-                const store = transaction.objectStore(storeName);
-                const request = store.getAll();
+                const characterData = JSON.parse(savedData);
+                document.getElementById('name').value = characterData.name || '';
+                document.getElementById('hp').value = characterData.hp || '';
+                document.getElementById('ac').value = characterData.ac || '';
                 
-                request.onsuccess = () => {
-                    const characters = request.result;
-                    
-                    if (characters.length === 0) {
-                        alert('No saved characters found on device.');
-                        return;
-                    }
-                    
-                    // Show character selection modal
-                    showCharacterSelection(characters);
-                };
-                
-                request.onerror = () => {
-                    alert('Error loading characters from device storage.');
-                };
+                alert('Character loaded successfully!\n\nName: ' + characterData.name + '\nHP: ' + characterData.hp + '\nAC: ' + characterData.ac);
                 
             } catch (error) {
-                console.error('IndexedDB load failed:', error);
-                alert('Device storage not available. Use regular Load button instead.');
+                alert('Error loading character: ' + error.message);
             }
         }
 
