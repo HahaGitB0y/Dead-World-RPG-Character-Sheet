@@ -261,18 +261,19 @@
             width: 100%;
             border-collapse: collapse;
             margin: 10px 0;
+            table-layout: fixed;
         }
         
         #skillsTable th:nth-child(1) {
-            width: 30%; /* Skill name */
+            width: 35%; /* Skill name - increased to prevent clipping */
         }
         
         #skillsTable th:nth-child(2) {
-            width: 15%; /* Modifier */
+            width: 12%; /* Modifier */
         }
         
         #skillsTable th:nth-child(3) {
-            width: 20%; /* Proficiency */
+            width: 18%; /* Proficiency */
         }
         
         #skillsTable th:nth-child(4) {
@@ -280,25 +281,41 @@
         }
         
         #skillsTable th:nth-child(5) {
-            width: 12.5%; /* XP - smaller than level */
+            width: 12.5%; /* XP */
         }
         
         #skillsTable th:nth-child(6) {
-            width: 12.5%; /* Next level - smaller than level */
+            width: 12.5%; /* Next level */
         }
         
         #skillsTable td {
-            padding: 5px;
+            padding: 4px;
+            vertical-align: middle;
+        }
+        
+        #skillsTable th {
+            padding: 8px 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        #skillsTable td:first-child {
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         #skillsTable input {
             width: 100%;
-            padding: 5px;
+            padding: 4px;
             background: #1a202c;
             border: 1px solid #4a5568;
             border-radius: 4px;
             color: #f7fafc;
-            font-size: 14px;
+            font-size: 12px;
             box-sizing: border-box;
         }
         
@@ -309,18 +326,24 @@
         
         #skillsTable select {
             width: 100%;
-            padding: 5px;
+            padding: 4px;
             background: #1a202c;
             border: 1px solid #4a5568;
             border-radius: 4px;
             color: #f7fafc;
-            font-size: 14px;
+            font-size: 12px;
             box-sizing: border-box;
         }
         
         .proficiency-checkboxes {
             display: flex;
-            gap: 5px;
+            gap: 2px;
+            flex-wrap: wrap;
+        }
+        
+        .proficiency-checkboxes label {
+            font-size: 10px;
+            white-space: nowrap;
         }
         
         .button-group {
@@ -1446,13 +1469,13 @@
             skills.forEach(skill => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${skill.name} (${skill.stat})</td>
+                    <td title="${skill.name} (${skill.stat})">${skill.name} (${skill.stat})</td>
                     <td><input type="text" class="skill-modifier" placeholder="+X"></td>
                     <td>
                         <div class="proficiency-checkboxes">
-                            <label><input type="radio" name="prof-${skill.name}" value="none"> None</label>
-                            <label><input type="radio" name="prof-${skill.name}" value="prof"> Prof</label>
-                            <label><input type="radio" name="prof-${skill.name}" value="exp"> Exp</label>
+                            <label><input type="radio" name="prof-${skill.name}" value="none"> N</label>
+                            <label><input type="radio" name="prof-${skill.name}" value="prof"> P</label>
+                            <label><input type="radio" name="prof-${skill.name}" value="exp"> E</label>
                         </div>
                     </td>
                     <td><input type="number" class="skill-level" min="0" max="6" placeholder="0"></td>
@@ -2990,25 +3013,40 @@
 
         // Update all stat modifiers and saving throws
         function updateStatModifiers() {
-            const proficiency = parseInt(document.getElementById('proficiency').value) || 0;
-            const disadvantage = getStatusDisadvantage();
-            
-            // Update stat modifiers
-            const stats = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
-            stats.forEach(stat => {
-                const statValue = document.getElementById(stat).value;
-                const modifier = getStatModifier(statValue) + disadvantage;
-                document.getElementById(stat + 'Mod').textContent = (modifier >= 0 ? '+' : '') + modifier;
-            });
-            
-            // Update saving throws
-            stats.forEach(stat => {
-                const statValue = document.getElementById(stat).value;
-                const baseModifier = getStatModifier(statValue);
-                const isProficient = document.getElementById('save' + stat.charAt(0).toUpperCase() + stat.slice(1))?.checked || false;
-                const totalModifier = baseModifier + (isProficient ? proficiency : 0) + disadvantage;
-                document.getElementById(stat + 'Save').textContent = (totalModifier >= 0 ? '+' : '') + totalModifier;
-            });
+            try {
+                const proficiency = parseInt(document.getElementById('proficiency').value) || 0;
+                const disadvantage = getStatusDisadvantage();
+                
+                // Update stat modifiers
+                const stats = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+                stats.forEach(stat => {
+                    const statInput = document.getElementById(stat);
+                    const modElement = document.getElementById(stat + 'Mod');
+                    
+                    if (statInput && modElement) {
+                        const statValue = statInput.value;
+                        const modifier = getStatModifier(statValue) + disadvantage;
+                        modElement.textContent = (modifier >= 0 ? '+' : '') + modifier;
+                    }
+                });
+                
+                // Update saving throws
+                stats.forEach(stat => {
+                    const statInput = document.getElementById(stat);
+                    const saveElement = document.getElementById(stat + 'Save');
+                    const saveCheckbox = document.getElementById('save' + stat.charAt(0).toUpperCase() + stat.slice(1));
+                    
+                    if (statInput && saveElement) {
+                        const statValue = statInput.value;
+                        const baseModifier = getStatModifier(statValue);
+                        const isProficient = saveCheckbox ? saveCheckbox.checked : false;
+                        const totalModifier = baseModifier + (isProficient ? proficiency : 0) + disadvantage;
+                        saveElement.textContent = (totalModifier >= 0 ? '+' : '') + totalModifier;
+                    }
+                });
+            } catch (error) {
+                console.error('Error updating stat modifiers:', error);
+            }
         }
 
         // Register Service Worker for PWA
