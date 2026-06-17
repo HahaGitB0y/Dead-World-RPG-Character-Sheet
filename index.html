@@ -221,7 +221,7 @@
         }
         
         #professionsTable th:nth-child(1) {
-            width: 60%; /* Profession name - expanded to fill space */
+            width: 50%; /* Profession name */
         }
         
         #professionsTable th:nth-child(2) {
@@ -229,11 +229,15 @@
         }
         
         #professionsTable th:nth-child(3) {
-            width: 13%; /* XP - smaller than level */
+            width: 13%; /* XP */
         }
         
         #professionsTable th:nth-child(4) {
-            width: 15%; /* Next level - smaller than level */
+            width: 15%; /* Next level */
+        }
+        
+        #professionsTable th:nth-child(5) {
+            width: 10%; /* Action */
         }
         
         #professionsTable td {
@@ -1143,6 +1147,17 @@
 
         <div class="section">
             <h2>PROFESSIONS</h2>
+            
+            <!-- Profession Selection -->
+            <div class="form-group">
+                <label for="professionSelect">SELECT PROFESSION:</label>
+                <select id="professionSelect">
+                    <option value="">Choose a profession...</option>
+                </select>
+                <button onclick="addProfession()">Add Profession</button>
+            </div>
+            
+            <!-- Selected Professions Table -->
             <table id="professionsTable">
                 <thead>
                     <tr>
@@ -1150,18 +1165,14 @@
                         <th>LEVEL</th>
                         <th>XP</th>
                         <th>NEXT LEVEL</th>
+                        <th>ACTION</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><input type="text" class="profession-name"></td>
-                        <td><input type="number" class="profession-level" min="0" max="6"></td>
-                        <td><input type="number" class="profession-xp" min="0"></td>
-                        <td><input type="number" class="profession-next" min="0"></td>
-                    </tr>
+                    <!-- Professions will be added here -->
                 </tbody>
             </table>
-            <button onclick="addProfessionRow()">Add Profession</button>
+            
             <div class="form-group">
                 <label for="lifeHacks">LIFE HACKS:</label>
                 <textarea id="lifeHacks" rows="3" placeholder="List unlocked life hacks"></textarea>
@@ -1462,6 +1473,101 @@
             { name: 'Survival', stat: 'WIS' }
         ];
 
+        // Professions data with XP requirements and related skills
+        const professions = [
+            {
+                name: 'Medic',
+                description: 'Medical expert who can treat injuries and diseases',
+                xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100],
+                skills: ['Medicine', 'Investigation', 'Insight'],
+                skillDescriptions: {
+                    'Medicine': 'Advanced medical treatment and diagnosis',
+                    'Investigation': 'Analyze symptoms and medical conditions',
+                    'Insight': 'Understand patient needs and conditions'
+                }
+            },
+            {
+                name: 'Mechanic',
+                description: 'Expert in repairing and maintaining vehicles and equipment',
+                xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100],
+                skills: ['Investigation', 'Athletics', 'Tinkering'],
+                skillDescriptions: {
+                    'Investigation': 'Diagnose mechanical problems',
+                    'Athletics': 'Physical labor and repairs',
+                    'Tinkering': 'Create and modify mechanical devices'
+                }
+            },
+            {
+                name: 'Scavenger',
+                description: 'Expert at finding and salvaging useful items',
+                xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100],
+                skills: ['Perception', 'Investigation', 'Stealth'],
+                skillDescriptions: {
+                    'Perception': 'Spot valuable items and dangers',
+                    'Investigation': 'Assess value and utility of finds',
+                    'Stealth': 'Move quietly while scavenging'
+                }
+            },
+            {
+                name: 'Leader',
+                description: 'Natural leader who can organize and motivate groups',
+                xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100],
+                skills: ['Persuasion', 'Insight', 'Intimidation'],
+                skillDescriptions: {
+                    'Persuasion': 'Convince and inspire others',
+                    'Insight': 'Understand group dynamics and needs',
+                    'Intimidation': 'Maintain order and discipline'
+                }
+            },
+            {
+                name: 'Hunter',
+                description: 'Expert tracker and provider of food',
+                xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100],
+                skills: ['Survival', 'Stealth', 'Athletics'],
+                skillDescriptions: {
+                    'Survival': 'Track game and find food sources',
+                    'Stealth': 'Approach prey undetected',
+                    'Athletics': 'Physical pursuits and carrying game'
+                }
+            },
+            {
+                name: 'Scholar',
+                description: 'Keeper of knowledge and research skills',
+                xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100],
+                skills: ['History', 'Investigation', 'Arcana'],
+                skillDescriptions: {
+                    'History': 'Knowledge of pre-apocalypse world',
+                    'Investigation': 'Research and analysis skills',
+                    'Arcana': 'Understanding of unusual phenomena'
+                }
+            },
+            {
+                name: 'Soldier',
+                description: 'Combat expert with tactical knowledge',
+                xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100],
+                skills: ['Athletics', 'Intimidation', 'Perception'],
+                skillDescriptions: {
+                    'Athletics': 'Combat maneuvers and physical conditioning',
+                    'Intimidation': 'Combat presence and tactics',
+                    'Perception': 'Spot threats and tactical advantages'
+                }
+            },
+            {
+                name: 'Technician',
+                description: 'Expert in electronics and communication systems',
+                xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100],
+                skills: ['Investigation', 'Tinkering', 'Arcana'],
+                skillDescriptions: {
+                    'Investigation': 'Diagnose technical problems',
+                    'Tinkering': 'Repair and modify electronic devices',
+                    'Arcana': 'Understanding of advanced technology'
+                }
+            }
+        ];
+
+        // Track selected professions
+        let selectedProfessions = [];
+
         
         // Initialize skills table
         function initializeSkillsTable() {
@@ -1516,17 +1622,154 @@
             });
         }
 
-        // Add profession row
-        function addProfessionRow() {
+        // Initialize profession select dropdown
+        function initializeProfessionSelect() {
+            const select = document.getElementById('professionSelect');
+            professions.forEach(prof => {
+                const option = document.createElement('option');
+                option.value = prof.name;
+                option.textContent = prof.name;
+                select.appendChild(option);
+            });
+        }
+
+        // Add profession to character
+        function addProfession() {
+            const select = document.getElementById('professionSelect');
+            const professionName = select.value;
+            
+            if (!professionName) {
+                alert('Please select a profession first.');
+                return;
+            }
+            
+            // Check if profession already selected
+            if (selectedProfessions.find(p => p.name === professionName)) {
+                alert('This profession is already selected.');
+                return;
+            }
+            
+            const profession = professions.find(p => p.name === professionName);
+            selectedProfessions.push({
+                ...profession,
+                currentXP: 0,
+                currentLevel: 0
+            });
+            
+            addProfessionToTable(professionName);
+            addProfessionSkills(profession);
+            
+            // Reset select
+            select.value = '';
+        }
+
+        // Add profession row to table
+        function addProfessionToTable(professionName) {
             const tbody = document.querySelector('#professionsTable tbody');
             const row = document.createElement('tr');
+            row.id = 'profession-' + professionName.replace(/\s+/g, '-');
+            
+            const profession = professions.find(p => p.name === professionName);
+            
             row.innerHTML = `
-                <td><input type="text" class="profession-name"></td>
-                <td><input type="number" class="profession-level" min="0" max="6"></td>
-                <td><input type="number" class="profession-xp" min="0"></td>
-                <td><input type="number" class="profession-next" min="0"></td>
+                <td>${professionName}</td>
+                <td><span class="profession-level-display">0</span></td>
+                <td><input type="number" class="profession-xp" min="0" value="0" onchange="updateProfessionLevel('${professionName}', this.value)"></td>
+                <td><span class="profession-next-display">100</span></td>
+                <td><button onclick="removeProfession('${professionName}')" style="padding: 4px 8px; font-size: 12px;">Remove</button></td>
             `;
+            
             tbody.appendChild(row);
+        }
+
+        // Update profession level based on XP
+        function updateProfessionLevel(professionName, xp) {
+            const profession = professions.find(p => p.name === professionName);
+            const selectedProf = selectedProfessions.find(p => p.name === professionName);
+            
+            if (!profession || !selectedProf) return;
+            
+            xp = parseInt(xp) || 0;
+            selectedProf.currentXP = xp;
+            
+            // Calculate level based on XP
+            let level = 0;
+            for (let i = profession.xpRequirements.length - 1; i >= 0; i--) {
+                if (xp >= profession.xpRequirements[i]) {
+                    level = i;
+                    break;
+                }
+            }
+            
+            selectedProf.currentLevel = level;
+            
+            // Update display
+            const row = document.getElementById('profession-' + professionName.replace(/\s+/g, '-'));
+            if (row) {
+                row.querySelector('.profession-level-display').textContent = level;
+                const nextLevelXP = level < 6 ? profession.xpRequirements[level + 1] : 'MAX';
+                row.querySelector('.profession-next-display').textContent = nextLevelXP;
+            }
+        }
+
+        // Remove profession
+        function removeProfession(professionName) {
+            const row = document.getElementById('profession-' + professionName.replace(/\s+/g, '-'));
+            if (row) {
+                row.remove();
+            }
+            
+            selectedProfessions = selectedProfessions.filter(p => p.name !== professionName);
+            removeProfessionSkills(professionName);
+        }
+
+        // Add profession-related skills to skills table
+        function addProfessionSkills(profession) {
+            const tbody = document.querySelector('#skillsTable tbody');
+            
+            profession.skills.forEach(skillName => {
+                // Check if skill already exists
+                const existingRow = Array.from(tbody.querySelectorAll('tr')).find(row => 
+                    row.querySelector('td').textContent.includes(skillName)
+                );
+                
+                if (!existingRow) {
+                    const row = document.createElement('tr');
+                    row.className = 'profession-skill';
+                    row.dataset.profession = profession.name;
+                    
+                    const description = profession.skillDescriptions[skillName] || '';
+                    const stat = getSkillStat(skillName);
+                    
+                    row.innerHTML = `
+                        <td title="${skillName} (${stat}) - ${description}">${skillName} (${stat})</td>
+                        <td><input type="text" class="skill-modifier" placeholder="+X"></td>
+                        <td>
+                            <div class="proficiency-checkboxes">
+                                <label><input type="radio" name="prof-${skillName}" value="none"> N</label>
+                                <label><input type="radio" name="prof-${skillName}" value="prof"> P</label>
+                                <label><input type="radio" name="prof-${skillName}" value="exp"> E</label>
+                            </div>
+                        </td>
+                        <td><input type="number" class="skill-level" min="0" max="6" placeholder="0"></td>
+                        <td><input type="number" class="skill-xp" min="0" placeholder="0"></td>
+                        <td><input type="number" class="skill-next" min="0" placeholder="0"></td>
+                    `;
+                    tbody.appendChild(row);
+                }
+            });
+        }
+
+        // Remove profession-related skills
+        function removeProfessionSkills(professionName) {
+            const rows = document.querySelectorAll(`.profession-skill[data-profession="${professionName}"]`);
+            rows.forEach(row => row.remove());
+        }
+
+        // Get stat for skill (helper function)
+        function getSkillStat(skillName) {
+            const skill = skills.find(s => s.name === skillName);
+            return skill ? skill.stat : 'CUSTOM';
         }
 
         // Add weapon row
@@ -3307,6 +3550,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             initializeSkillsTable();
             initializeStatusTrackers();
+            initializeProfessionSelect();
             updateStatModifiers(); // Initial calculation
             updateWeaponStats(); // Initial weapon calculation
             
