@@ -1624,13 +1624,26 @@
 
         // Initialize profession select dropdown
         function initializeProfessionSelect() {
-            const select = document.getElementById('professionSelect');
-            professions.forEach(prof => {
-                const option = document.createElement('option');
-                option.value = prof.name;
-                option.textContent = prof.name;
-                select.appendChild(option);
-            });
+            try {
+                const select = document.getElementById('professionSelect');
+                if (!select) {
+                    console.error('Profession select element not found');
+                    return;
+                }
+                
+                console.log('Initializing professions dropdown with', professions.length, 'professions');
+                
+                professions.forEach(prof => {
+                    const option = document.createElement('option');
+                    option.value = prof.name;
+                    option.textContent = prof.name;
+                    select.appendChild(option);
+                });
+                
+                console.log('Professions dropdown initialized successfully');
+            } catch (error) {
+                console.error('Error initializing profession select:', error);
+            }
         }
 
         // Add profession to character
@@ -3560,6 +3573,15 @@
             // Add auto-save listeners
             addAutoSaveListeners();
         });
+
+        // Fallback initialization in case DOMContentLoaded doesn't work
+        setTimeout(function() {
+            const select = document.getElementById('professionSelect');
+            if (select && select.options.length <= 1) {
+                console.log('Fallback: Initializing professions dropdown');
+                initializeProfessionSelect();
+            }
+        }, 1000);
     </script>
 </body>
 </html>
