@@ -3638,7 +3638,10 @@
             
             // Update stored level
             const profData = window.selectedProfessions.find(p => p.name === professionName);
-            if (profData) profData.currentLevel = level;
+            if (profData) {
+                profData.currentLevel = level;
+                console.log('Updated profession level:', professionName, 'Level:', level, 'XP:', profData.totalXP);
+            }
         }
 
         // Remove profession
