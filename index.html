@@ -242,6 +242,28 @@
         
         #professionsTable td {
             padding: 5px;
+            font-size: 12px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        #professionsTable td:first-child {
+            max-width: 200px;
+        }
+        
+        .profession-level-display, .profession-next-display {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #1a202c;
+            border: 1px solid #4a5568;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        #professionSelect {
+            max-width: 100%;
+            font-size: 14px;
         }
         
         #professionsTable input {
@@ -1475,94 +1497,97 @@
 
         // Professions data with XP requirements and related skills
         const professions = [
-            {
-                name: 'Medic',
-                description: 'Medical expert who can treat injuries and diseases',
-                xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100],
-                skills: ['Medicine', 'Investigation', 'Insight'],
-                skillDescriptions: {
-                    'Medicine': 'Advanced medical treatment and diagnosis',
-                    'Investigation': 'Analyze symptoms and medical conditions',
-                    'Insight': 'Understand patient needs and conditions'
-                }
-            },
-            {
-                name: 'Mechanic',
-                description: 'Expert in repairing and maintaining vehicles and equipment',
-                xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100],
-                skills: ['Investigation', 'Athletics', 'Tinkering'],
-                skillDescriptions: {
-                    'Investigation': 'Diagnose mechanical problems',
-                    'Athletics': 'Physical labor and repairs',
-                    'Tinkering': 'Create and modify mechanical devices'
-                }
-            },
-            {
-                name: 'Scavenger',
-                description: 'Expert at finding and salvaging useful items',
-                xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100],
-                skills: ['Perception', 'Investigation', 'Stealth'],
-                skillDescriptions: {
-                    'Perception': 'Spot valuable items and dangers',
-                    'Investigation': 'Assess value and utility of finds',
-                    'Stealth': 'Move quietly while scavenging'
-                }
-            },
-            {
-                name: 'Leader',
-                description: 'Natural leader who can organize and motivate groups',
-                xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100],
-                skills: ['Persuasion', 'Insight', 'Intimidation'],
-                skillDescriptions: {
-                    'Persuasion': 'Convince and inspire others',
-                    'Insight': 'Understand group dynamics and needs',
-                    'Intimidation': 'Maintain order and discipline'
-                }
-            },
-            {
-                name: 'Hunter',
-                description: 'Expert tracker and provider of food',
-                xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100],
-                skills: ['Survival', 'Stealth', 'Athletics'],
-                skillDescriptions: {
-                    'Survival': 'Track game and find food sources',
-                    'Stealth': 'Approach prey undetected',
-                    'Athletics': 'Physical pursuits and carrying game'
-                }
-            },
-            {
-                name: 'Scholar',
-                description: 'Keeper of knowledge and research skills',
-                xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100],
-                skills: ['History', 'Investigation', 'Arcana'],
-                skillDescriptions: {
-                    'History': 'Knowledge of pre-apocalypse world',
-                    'Investigation': 'Research and analysis skills',
-                    'Arcana': 'Understanding of unusual phenomena'
-                }
-            },
-            {
-                name: 'Soldier',
-                description: 'Combat expert with tactical knowledge',
-                xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100],
-                skills: ['Athletics', 'Intimidation', 'Perception'],
-                skillDescriptions: {
-                    'Athletics': 'Combat maneuvers and physical conditioning',
-                    'Intimidation': 'Combat presence and tactics',
-                    'Perception': 'Spot threats and tactical advantages'
-                }
-            },
-            {
-                name: 'Technician',
-                description: 'Expert in electronics and communication systems',
-                xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100],
-                skills: ['Investigation', 'Tinkering', 'Arcana'],
-                skillDescriptions: {
-                    'Investigation': 'Diagnose technical problems',
-                    'Tinkering': 'Repair and modify electronic devices',
-                    'Arcana': 'Understanding of advanced technology'
-                }
-            }
+            // Medical Professions
+            { name: 'Doctor', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Medicine', 'Investigation', 'Insight'] },
+            { name: 'Nurse', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Medicine', 'Persuasion', 'Insight'] },
+            { name: 'Surgeon', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Medicine', 'Investigation', 'Sleight of Hand'] },
+            { name: 'Paramedic', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Medicine', 'Athletics', 'Perception'] },
+            { name: 'Pharmacist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Medicine', 'Investigation', 'Arcana'] },
+            { name: 'Veterinarian', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Animal Handling', 'Medicine', 'Nature'] },
+            { name: 'Psychiatrist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Insight', 'Persuasion', 'Medicine'] },
+            
+            // Technical/Engineering Professions
+            { name: 'Engineer', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Tinkering', 'History'] },
+            { name: 'Electrician', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Tinkering', 'Investigation', 'Perception'] },
+            { name: 'Mechanic', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Athletics', 'Tinkering'] },
+            { name: 'Carpenter', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Athletics', 'Investigation', 'Tinkering'] },
+            { name: 'Plumber', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Athletics', 'Perception'] },
+            { name: 'Welder', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Athletics', 'Investigation', 'Tinkering'] },
+            { name: 'Technician', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Tinkering', 'Arcana'] },
+            { name: 'IT Specialist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Arcana', 'History'] },
+            
+            // Combat/Military Professions
+            { name: 'Soldier', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Athletics', 'Intimidation', 'Perception'] },
+            { name: 'Police Officer', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Perception', 'Intimidation', 'Athletics'] },
+            { name: 'Security Guard', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Perception', 'Intimidation', 'Insight'] },
+            { name: 'Martial Artist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Athletics', 'Acrobatics', 'Insight'] },
+            { name: 'Hunter', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Survival', 'Stealth', 'Athletics'] },
+            { name: 'Marksman', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Perception', 'Stealth', 'Investigation'] },
+            
+            // Survival/Outdoor Professions
+            { name: 'Ranger', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Survival', 'Nature', 'Perception'] },
+            { name: 'Farmer', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Nature', 'Animal Handling', 'Survival'] },
+            { name: 'Fisherman', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Survival', 'Perception', 'Nature'] },
+            { name: 'Trapper', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Survival', 'Stealth', 'Nature'] },
+            { name: 'Guide', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Survival', 'Perception', 'Persuasion'] },
+            { name: 'Scavenger', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Perception', 'Investigation', 'Stealth'] },
+            
+            // Social/Leadership Professions
+            { name: 'Leader', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Persuasion', 'Insight', 'Intimidation'] },
+            { name: 'Politician', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Persuasion', 'Deception', 'Insight'] },
+            { name: 'Teacher', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['History', 'Persuasion', 'Insight'] },
+            { name: 'Negotiator', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Persuasion', 'Insight', 'Deception'] },
+            { name: 'Preacher', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Persuasion', 'Religion', 'Insight'] },
+            { name: 'Diplomat', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Persuasion', 'Insight', 'Deception'] },
+            
+            // Knowledge/Academic Professions
+            { name: 'Scientist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Arcana', 'Investigation', 'History'] },
+            { name: 'Historian', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['History', 'Investigation', 'Arcana'] },
+            { name: 'Librarian', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['History', 'Investigation', 'Arcana'] },
+            { name: 'Archaeologist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['History', 'Investigation', 'Perception'] },
+            { name: 'Chemist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Arcana', 'Investigation', 'Medicine'] },
+            { name: 'Biologist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Nature', 'Investigation', 'Arcana'] },
+            
+            // Criminal/Underworld Professions
+            { name: 'Thief', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Stealth', 'Sleight of Hand', 'Deception'] },
+            { name: 'Smuggler', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Deception', 'Stealth', 'Persuasion'] },
+            { name: 'Hacker', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Arcana', 'Deception'] },
+            { name: 'Con Artist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Deception', 'Persuasion', 'Insight'] },
+            { name: 'Spy', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Stealth', 'Deception', 'Investigation'] },
+            { name: 'Assassin', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Stealth', 'Sleight of Hand', 'Perception'] },
+            
+            // Service/Trade Professions
+            { name: 'Cook', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Nature', 'Survival', 'Perception'] },
+            { name: 'Bartender', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Insight', 'Persuasion', 'Perception'] },
+            { name: 'Merchant', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Persuasion', 'Insight', 'Investigation'] },
+            { name: 'Tailor', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Sleight of Hand', 'Investigation', 'Perception'] },
+            { name: 'Blacksmith', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Athletics', 'Investigation', 'Tinkering'] },
+            { name: 'Jeweler', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Sleight of Hand', 'Investigation', 'Perception'] },
+            
+            // Creative/Artistic Professions
+            { name: 'Musician', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Performance', 'Persuasion', 'Insight'] },
+            { name: 'Artist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Sleight of Hand', 'Perception', 'Insight'] },
+            { name: 'Writer', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['History', 'Persuasion', 'Insight'] },
+            { name: 'Actor', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Performance', 'Deception', 'Persuasion'] },
+            
+            // Transportation Professions
+            { name: 'Pilot', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Perception', 'Tinkering'] },
+            { name: 'Driver', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Perception', 'Athletics', 'Investigation'] },
+            { name: 'Sailor', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Athletics', 'Nature', 'Perception'] },
+            
+            // Communication Professions
+            { name: 'Radio Operator', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Perception', 'Arcana'] },
+            { name: 'Journalist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Persuasion', 'Insight'] },
+            { name: 'Interpreter', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Insight', 'Persuasion', 'History'] },
+            
+            // Religious/Spiritual Professions
+            { name: 'Priest', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Religion', 'Persuasion', 'Insight'] },
+            { name: 'Monk', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Religion', 'Insight', 'Athletics'] },
+            { name: 'Shaman', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Religion', 'Nature', 'Arcana'] },
+            
+            // Animal Professions
+            { name: 'Animal Trainer', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Animal Handling', 'Nature', 'Insight'] },
+            { name: 'Zookeeper', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Animal Handling', 'Nature', 'Medicine'] }
         ];
 
         // Track selected professions
@@ -1624,26 +1649,30 @@
 
         // Initialize profession select dropdown
         function initializeProfessionSelect() {
-            try {
-                const select = document.getElementById('professionSelect');
-                if (!select) {
-                    console.error('Profession select element not found');
-                    return;
-                }
-                
-                console.log('Initializing professions dropdown with', professions.length, 'professions');
-                
-                professions.forEach(prof => {
-                    const option = document.createElement('option');
-                    option.value = prof.name;
-                    option.textContent = prof.name;
-                    select.appendChild(option);
-                });
-                
-                console.log('Professions dropdown initialized successfully');
-            } catch (error) {
-                console.error('Error initializing profession select:', error);
+            const select = document.getElementById('professionSelect');
+            if (!select) {
+                console.error('Profession select element not found');
+                return;
             }
+            
+            // Clear existing options except the first one
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+            
+            console.log('Initializing professions dropdown with', professions.length, 'professions');
+            
+            // Sort professions alphabetically
+            const sortedProfessions = [...professions].sort((a, b) => a.name.localeCompare(b.name));
+            
+            sortedProfessions.forEach(prof => {
+                const option = document.createElement('option');
+                option.value = prof.name;
+                option.textContent = prof.name;
+                select.appendChild(option);
+            });
+            
+            console.log('Professions dropdown initialized successfully with', select.options.length - 1, 'professions');
         }
 
         // Add profession to character
