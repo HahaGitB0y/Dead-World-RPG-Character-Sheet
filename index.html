@@ -625,12 +625,11 @@
         <h1>DEAD WORLD CHARACTER SHEET</h1>
         
         <div class="button-group">
-            <button ontouchstart="handleSave()" onclick="handleSave()">💾 Save Character</button>
-            <button ontouchstart="document.getElementById('loadFile').click()" onclick="document.getElementById('loadFile').click()">📁 Load Character</button>
-            <button ontouchstart="handleSaveDevice()" onclick="handleSaveDevice()">📱 Save to Device</button>
-            <button ontouchstart="handleLoadDevice()" onclick="handleLoadDevice()">📱 Load from Device</button>
+            <button ontouchstart="saveCharacter()" onclick="saveCharacter()">💾 Save Character</button>
+            <button ontouchstart="loadCharacter()" onclick="loadCharacter()">📁 Load Character</button>
+            <button ontouchstart="saveCharacter()" onclick="saveCharacter()">📱 Save to Device</button>
+            <button ontouchstart="loadCharacter()" onclick="loadCharacter()">📱 Load from Device</button>
             <button ontouchstart="handleClear()" onclick="handleClear()">🗑️ Clear All</button>
-            <input type="file" id="loadFile" accept=".json" style="display: none;" onchange="loadCharacterFromFile(event)">
         </div>
         
         <script>
