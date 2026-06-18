@@ -3612,19 +3612,26 @@
             }
         }, 1000);
 
-        // NOTE: Professions data is defined earlier in the file (around line 1476)
+        // NOTE: Professions data is defined earlier in the file
         // This section adds the initialization and management functions
+
+        // Diagnostic logging
+        console.log('Professions script section loading...');
+        console.log('professions array exists:', typeof professions !== 'undefined');
+        console.log('professions array length:', typeof professions !== 'undefined' ? professions.length : 'N/A');
 
         // Track selected professions (if not already defined)
         if (typeof selectedProfessions === 'undefined') {
-            let selectedProfessions = [];
+            var selectedProfessions = [];
         }
 
         // Initialize profession select dropdown (using existing professions array)
         function initializeProfessionSelect() {
+            console.log('initializeProfessionSelect called');
             const select = document.getElementById('professionSelect');
             if (!select) {
                 console.error('Profession select element not found');
+                alert('Error: Could not find profession dropdown element');
                 return;
             }
             
@@ -3770,15 +3777,34 @@
             return skill ? skill.stat : 'INT';
         }
 
-        // Initialize on page load
+        // Initialize on page load with comprehensive error handling
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOMContentLoaded fired');
+            console.log('=== DOMContentLoaded fired ===');
             try {
+                // Check if professions array exists and has data
+                if (typeof professions === 'undefined') {
+                    console.error('CRITICAL ERROR: professions array is undefined!');
+                    alert('Error: Professions data not found. Please check console for details.');
+                    return;
+                }
+                if (!Array.isArray(professions)) {
+                    console.error('CRITICAL ERROR: professions is not an array!');
+                    alert('Error: Professions data is corrupted. Please check console for details.');
+                    return;
+                }
+                if (professions.length === 0) {
+                    console.error('CRITICAL ERROR: professions array is empty!');
+                    alert('Error: No professions found. Please check console for details.');
+                    return;
+                }
+                
+                console.log('Professions array validated:', professions.length, 'professions found');
                 initializeProfessionSelect();
-                console.log('initializeProfessionSelect completed');
+                console.log('=== Professions initialization completed successfully ===');
             } catch (error) {
-                console.error('Error in initializeProfessionSelect:', error);
-                alert('Error loading professions: ' + error.message);
+                console.error('CRITICAL ERROR in professions initialization:', error);
+                console.error('Stack trace:', error.stack);
+                alert('Error loading professions: ' + error.message + '. Check browser console for details.');
             }
         });
 
