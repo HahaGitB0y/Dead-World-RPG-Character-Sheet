@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Professions</title>
+</head>
+<body>
+    <h1>Professions Test</h1>
+    <select id="professionSelect">
+        <option value="">Choose a profession...</option>
+    </select>
+    <div id="status"></div>
+
+    <script>
+        // Minimal professions data for testing
+        const professions = [
+            { name: 'Doctor', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Medicine', 'Investigation', 'Insight'] },
+            { name: 'Nurse', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Medicine', 'Persuasion', 'Insight'] },
+            { name: 'Mechanic', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Athletics', 'Tinkering'] }
+        ];
+
+        function initializeProfessionSelect() {
+            const select = document.getElementById('professionSelect');
+            const status = document.getElementById('status');
+            
+            if (!select) {
+                status.innerHTML = '<p style="color: red;">ERROR: Select element not found</p>';
+                return;
+            }
+            
+            try {
+                // Clear existing options except the first one
+                while (select.options.length > 1) {
+                    select.remove(1);
+                }
+                
+                // Sort professions alphabetically
+                const sortedProfessions = [...professions].sort((a, b) => a.name.localeCompare(b.name));
+                
+                sortedProfessions.forEach(prof => {
+                    const option = document.createElement('option');
+                    option.value = prof.name;
+                    option.textContent = prof.name;
+                    select.appendChild(option);
+                });
+                
+                status.innerHTML = '<p style="color: green;">SUCCESS: ' + (select.options.length - 1) + ' professions loaded</p>';
+            } catch (error) {
+                status.innerHTML = '<p style="color: red;">ERROR: ' + error.message + '</p>';
+                console.error(error);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeProfessionSelect);
+    </script>
+</body>
+</html>
