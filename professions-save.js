@@ -3,6 +3,12 @@
 
 console.log('=== Professions Save/Load Extension Loading ===');
 
+// Initialize selectedProfessions if not already defined
+if (!window.selectedProfessions) {
+    window.selectedProfessions = [];
+    console.log('Initialized window.selectedProfessions');
+}
+
 // Store original functions
 const originalSaveCharacter = window.saveCharacter;
 const originalLoadCharacter = window.loadCharacter;
