@@ -1,12 +1,66 @@
 // Professions Save/Load Extension
-// This extends the saveCharacter and loadCharacter functions to include professions data
+// This extends the saveCharacter and loadCharacter functions to include professions and skills data
 
 // Store original functions
 const originalSaveCharacter = window.saveCharacter;
 const originalLoadCharacter = window.loadCharacter;
 
-// Override saveCharacter to include professions
+// Helper function to collect skills data
+function collectSkillsData() {
+    const skills = {};
+    const skillRows = document.querySelectorAll('.skill-row, tr');
+    
+    skillRows.forEach(row => {
+        // Find skill name
+        const skillNameElement = row.querySelector('.skill-name, td:first-child');
+        if (!skillNameElement) return;
+        
+        const skillName = skillNameElement.textContent.trim().split('(')[0].trim();
+        if (!skillName) return;
+        
+        // Find N/P/E checkboxes
+        const checkboxes = row.querySelectorAll('input[type="checkbox"]');
+        if (checkboxes.length >= 3) {
+            skills[skillName] = {
+                N: checkboxes[0].checked,
+                P: checkboxes[1].checked,
+                E: checkboxes[2].checked
+            };
+        }
+    });
+    
+    return skills;
+}
+
+// Helper function to restore skills data
+function restoreSkillsData(skills) {
+    if (!skills) return;
+    
+    const skillRows = document.querySelectorAll('.skill-row, tr');
+    
+    skillRows.forEach(row => {
+        const skillNameElement = row.querySelector('.skill-name, td:first-child');
+        if (!skillNameElement) return;
+        
+        const skillName = skillNameElement.textContent.trim().split('(')[0].trim();
+        if (!skillName || !skills[skillName]) return;
+        
+        const checkboxes = row.querySelectorAll('input[type="checkbox"]');
+        if (checkboxes.length >= 3) {
+            checkboxes[0].checked = skills[skillName].N || false;
+            checkboxes[1].checked = skills[skillName].P || false;
+            checkboxes[2].checked = skills[skillName].E || false;
+        }
+    });
+}
+
+// Override saveCharacter to include professions and skills
 window.saveCharacter = function() {
+    // Call original first to save base character data
+    if (originalSaveCharacter && originalSaveCharacter !== window.saveCharacter) {
+        originalSaveCharacter();
+    }
+    
     // Get existing character data from localStorage or create new
     let characterData = {};
     const savedData = localStorage.getItem('deadWorldCharacter');
@@ -21,16 +75,15 @@ window.saveCharacter = function() {
     // Add professions data
     characterData.selectedProfessions = window.selectedProfessions || [];
     
+    // Add skills data
+    characterData.skills = collectSkillsData();
+    
     // Save back to localStorage
     localStorage.setItem('deadWorldCharacter', JSON.stringify(characterData));
     
     console.log('Saved professions:', characterData.selectedProfessions);
-    alert('Character saved! Professions: ' + (window.selectedProfessions ? window.selectedProfessions.length : 0) + ' saved.');
-    
-    // Call original if it exists
-    if (originalSaveCharacter && originalSaveCharacter !== window.saveCharacter) {
-        return originalSaveCharacter();
-    }
+    console.log('Saved skills:', characterData.skills);
+    alert('Character saved! Professions: ' + (window.selectedProfessions ? window.selectedProfessions.length : 0) + ' saved. Skills saved.');
 };
 
 // Override loadCharacter to restore professions
@@ -80,7 +133,13 @@ window.loadCharacter = function() {
             console.log('Loaded professions:', window.selectedProfessions);
         }
         
-        alert('Character loaded! Professions: ' + (window.selectedProfessions ? window.selectedProfessions.length : 0) + ' loaded.');
+        // Restore skills
+        if (characterData.skills) {
+            restoreSkillsData(characterData.skills);
+            console.log('Loaded skills:', characterData.skills);
+        }
+        
+        alert('Character loaded! Professions: ' + (window.selectedProfessions ? window.selectedProfessions.length : 0) + ' loaded. Skills restored.');
         
     } catch (error) {
         console.error('Error loading character:', error);
