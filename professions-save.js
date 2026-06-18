@@ -19,27 +19,41 @@ console.log('Original loadCharacter exists:', typeof originalLoadCharacter === '
 // Helper function to collect skills data
 function collectSkillsData() {
     const skills = {};
-    const skillRows = document.querySelectorAll('.skill-row, tr');
     
-    skillRows.forEach(row => {
-        // Find skill name
-        const skillNameElement = row.querySelector('.skill-name, td:first-child');
-        if (!skillNameElement) return;
+    // Find all table rows in the skills table
+    const skillsTable = document.querySelector('#skillsTable, table');
+    if (!skillsTable) {
+        console.log('Skills table not found');
+        return skills;
+    }
+    
+    const skillRows = skillsTable.querySelectorAll('tbody tr, tr');
+    console.log('Found', skillRows.length, 'skill rows');
+    
+    skillRows.forEach((row, index) => {
+        // Find skill name - first td contains skill name like "Acrobatics (DEX)"
+        const cells = row.querySelectorAll('td');
+        if (cells.length < 2) return;
         
-        const skillName = skillNameElement.textContent.trim().split('(')[0].trim();
-        if (!skillName) return;
+        const skillNameCell = cells[0];
+        const skillName = skillNameCell.textContent.trim().split('(')[0].trim();
+        if (!skillName || skillName === 'Skill') return; // Skip header row
         
-        // Find N/P/E checkboxes
+        // Find N/P/E checkboxes in this row
         const checkboxes = row.querySelectorAll('input[type="checkbox"]');
+        console.log('Row', index, '- Skill:', skillName, '- Checkboxes found:', checkboxes.length);
+        
         if (checkboxes.length >= 3) {
             skills[skillName] = {
                 N: checkboxes[0].checked,
                 P: checkboxes[1].checked,
                 E: checkboxes[2].checked
             };
+            console.log('Saved skill:', skillName, skills[skillName]);
         }
     });
     
+    console.log('Total skills collected:', Object.keys(skills).length);
     return skills;
 }
 
