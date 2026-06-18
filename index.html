@@ -3550,24 +3550,68 @@
         function addProfessionToTable(professionName) {
             const tbody = document.querySelector('#professionsTable tbody');
             const profession = professions.find(p => p.name === professionName);
+            const profId = professionName.replace(/\s+/g, '-');
             
             const row = document.createElement('tr');
-            row.id = 'profession-' + professionName.replace(/\s+/g, '-');
+            row.id = 'profession-' + profId;
             row.innerHTML = `
                 <td>${professionName}</td>
-                <td><span class="profession-level-display" id="level-${professionName.replace(/\s+/g, '-')}">0</span></td>
-                <td><input type="number" class="profession-xp" min="0" placeholder="0" onchange="updateProfessionLevel('${professionName}', this.value)"></td>
-                <td><span class="profession-next-display" id="next-${professionName.replace(/\s+/g, '-')}">100</span></td>
+                <td><span class="profession-level-display" id="level-${profId}">0</span></td>
+                <td><span class="profession-total-xp" id="total-xp-${profId}">0</span></td>
+                <td>
+                    <input type="text" class="profession-xp-delta" placeholder="+/- XP" 
+                           onchange="adjustProfessionXP('${professionName}', this.value)"
+                           style="width: 80px;">
+                </td>
+                <td><span class="profession-next-display" id="next-${profId}">100</span></td>
                 <td><button onclick="removeProfession('${professionName}')">Remove</button></td>
             `;
             
             tbody.appendChild(row);
+            
+            // Initialize profession data
+            const profData = selectedProfessions.find(p => p.name === professionName);
+            if (profData) {
+                profData.totalXP = 0;
+                profData.currentLevel = 0;
+            }
         }
 
-        // Update profession level based on XP
-        function updateProfessionLevel(professionName, xp) {
+        // Adjust profession XP (add or remove)
+        function adjustProfessionXP(professionName, deltaXP) {
+            const profData = selectedProfessions.find(p => p.name === professionName);
+            if (!profData) return;
+            
+            // Parse the delta value (supports +10, -5, or just 10)
+            const delta = parseInt(deltaXP) || 0;
+            if (delta === 0) return;
+            
+            // Calculate new total XP (can't go below 0)
+            let newTotal = (profData.totalXP || 0) + delta;
+            if (newTotal < 0) newTotal = 0;
+            
+            // Update stored data
+            profData.totalXP = newTotal;
+            
+            // Update the display
+            const profId = professionName.replace(/\s+/g, '-');
+            const totalElement = document.getElementById('total-xp-' + profId);
+            if (totalElement) totalElement.textContent = newTotal;
+            
+            // Clear the input field
+            const input = document.querySelector('#profession-' + profId + ' .profession-xp-delta');
+            if (input) input.value = '';
+            
+            // Recalculate level
+            updateProfessionLevel(professionName, newTotal);
+            
+            console.log(`Adjusted ${professionName} XP by ${delta}, new total: ${newTotal}`);
+        }
+
+        // Update profession level based on total XP
+        function updateProfessionLevel(professionName, totalXP) {
             const profession = professions.find(p => p.name === professionName);
-            const xpValue = parseInt(xp) || 0;
+            const xpValue = Math.max(0, parseInt(totalXP) || 0);
             
             let level = 0;
             for (let i = 0; i < profession.xpRequirements.length; i++) {
@@ -3581,11 +3625,16 @@
             const nextLevelXp = profession.xpRequirements[level + 1] || 'MAX';
             
             // Update display
-            const levelElement = document.getElementById('level-' + professionName.replace(/\s+/g, '-'));
-            const nextElement = document.getElementById('next-' + professionName.replace(/\s+/g, '-'));
+            const profId = professionName.replace(/\s+/g, '-');
+            const levelElement = document.getElementById('level-' + profId);
+            const nextElement = document.getElementById('next-' + profId);
             
             if (levelElement) levelElement.textContent = level;
             if (nextElement) nextElement.textContent = nextLevelXp === 'MAX' ? 'MAX' : nextLevelXp;
+            
+            // Update stored level
+            const profData = selectedProfessions.find(p => p.name === professionName);
+            if (profData) profData.currentLevel = level;
         }
 
         // Remove profession
