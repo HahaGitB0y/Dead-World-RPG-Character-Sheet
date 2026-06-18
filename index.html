@@ -3521,6 +3521,9 @@
             const select = document.getElementById('professionSelect');
             const professionName = select.value;
             
+            console.log('addProfession called with:', professionName);
+            console.log('window.selectedProfessions before:', window.selectedProfessions);
+            
             if (!professionName) {
                 alert('Please select a profession first.');
                 return;
@@ -3538,6 +3541,8 @@
                 totalXP: 0,
                 currentLevel: 0
             });
+            
+            console.log('window.selectedProfessions after:', window.selectedProfessions);
             
             addProfessionToTable(professionName);
             addProfessionSkills(profession);
