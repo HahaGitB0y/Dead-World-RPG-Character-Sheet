@@ -95,15 +95,9 @@ window.saveCharacter = function() {
     alert('Character saved! Professions: ' + (characterData.selectedProfessions ? characterData.selectedProfessions.length : 0) + ' saved. Skills saved.');
 };
 
-// Override loadCharacter to restore professions
+// Override loadCharacter to restore professions from localStorage (mobile-friendly)
 window.loadCharacter = function() {
     console.log('=== Load Character called ===');
-    
-    // Call original first to load base character data
-    if (originalLoadCharacter && originalLoadCharacter !== window.loadCharacter) {
-        console.log('Calling original loadCharacter');
-        originalLoadCharacter();
-    }
     
     const savedData = localStorage.getItem('deadWorldCharacter');
     if (!savedData) {
@@ -117,6 +111,25 @@ window.loadCharacter = function() {
     try {
         const characterData = JSON.parse(savedData);
         console.log('Parsed character data:', characterData);
+        
+        // Load base character data
+        if (characterData.name) document.getElementById('name').value = characterData.name;
+        if (characterData.age) document.getElementById('age').value = characterData.age;
+        if (characterData.gender) document.getElementById('gender').value = characterData.gender;
+        if (characterData.background) document.getElementById('background').value = characterData.background;
+        if (characterData.hp) document.getElementById('hp').value = characterData.hp;
+        if (characterData.ac) document.getElementById('ac').value = characterData.ac;
+        
+        // Load stats
+        if (characterData.stats) {
+            if (characterData.stats.str) document.getElementById('str').value = characterData.stats.str;
+            if (characterData.stats.dex) document.getElementById('dex').value = characterData.stats.dex;
+            if (characterData.stats.con) document.getElementById('con').value = characterData.stats.con;
+            if (characterData.stats.int) document.getElementById('int').value = characterData.stats.int;
+            if (characterData.stats.wis) document.getElementById('wis').value = characterData.stats.wis;
+            if (characterData.stats.cha) document.getElementById('cha').value = characterData.stats.cha;
+        }
+        
         console.log('selectedProfessions in data:', characterData.selectedProfessions);
         
         // Restore professions
