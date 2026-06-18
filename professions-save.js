@@ -39,15 +39,25 @@ function collectSkillsData() {
         const skillName = skillNameCell.textContent.trim().split('(')[0].trim();
         if (!skillName || skillName === 'Skill') return; // Skip header row
         
-        // Find N/P/E checkboxes in this row
-        const checkboxes = row.querySelectorAll('input[type="checkbox"]');
-        console.log('Row', index, '- Skill:', skillName, '- Checkboxes found:', checkboxes.length);
+        // Find N/P/E radio buttons in this row
+        const radioButtons = row.querySelectorAll('input[type="radio"]');
+        console.log('Row', index, '- Skill:', skillName, '- Radio buttons found:', radioButtons.length);
         
-        if (checkboxes.length >= 3) {
+        if (radioButtons.length >= 3) {
+            // Check which radio is selected
+            let n = false, p = false, e = false;
+            radioButtons.forEach(radio => {
+                if (radio.checked) {
+                    if (radio.value === 'none' || radio.value === 'N') n = true;
+                    if (radio.value === 'prof' || radio.value === 'P') p = true;
+                    if (radio.value === 'exp' || radio.value === 'E') e = true;
+                }
+            });
+            
             skills[skillName] = {
-                N: checkboxes[0].checked,
-                P: checkboxes[1].checked,
-                E: checkboxes[2].checked
+                N: n,
+                P: p,
+                E: e
             };
             console.log('Saved skill:', skillName, skills[skillName]);
         }
@@ -82,11 +92,19 @@ function restoreSkillsData(skills) {
         const skillName = cells[0].textContent.trim().split('(')[0].trim();
         if (!skillName || !skills[skillName]) return;
         
-        const checkboxes = row.querySelectorAll('input[type="checkbox"]');
-        if (checkboxes.length >= 3) {
-            checkboxes[0].checked = skills[skillName].N || false;
-            checkboxes[1].checked = skills[skillName].P || false;
-            checkboxes[2].checked = skills[skillName].E || false;
+        // Find N/P/E radio buttons in this row
+        const radioButtons = row.querySelectorAll('input[type="radio"]');
+        if (radioButtons.length >= 3) {
+            // Check the appropriate radio based on saved data
+            radioButtons.forEach(radio => {
+                if (skills[skillName].N && (radio.value === 'none' || radio.value === 'N')) {
+                    radio.checked = true;
+                } else if (skills[skillName].P && (radio.value === 'prof' || radio.value === 'P')) {
+                    radio.checked = true;
+                } else if (skills[skillName].E && (radio.value === 'exp' || radio.value === 'E')) {
+                    radio.checked = true;
+                }
+            });
             console.log('Restored skill:', skillName, skills[skillName]);
         }
     });
