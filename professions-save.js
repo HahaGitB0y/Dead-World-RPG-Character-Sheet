@@ -65,34 +65,83 @@ window.saveCharacter = function() {
     console.log('selectedProfessions before save:', window.selectedProfessions);
     console.log('selectedProfessions length:', window.selectedProfessions ? window.selectedProfessions.length : 'undefined');
     
-    // Call original first to save base character data
-    if (originalSaveCharacter && originalSaveCharacter !== window.saveCharacter) {
-        originalSaveCharacter();
-    }
+    // First, collect all character data
+    const stats = {
+        str: document.getElementById('str')?.value || '',
+        dex: document.getElementById('dex')?.value || '',
+        con: document.getElementById('con')?.value || '',
+        int: document.getElementById('int')?.value || '',
+        wis: document.getElementById('wis')?.value || '',
+        cha: document.getElementById('cha')?.value || ''
+    };
     
-    // Get existing character data from localStorage or create new
-    let characterData = {};
-    const savedData = localStorage.getItem('deadWorldCharacter');
-    if (savedData) {
+    // Collect equipment slots
+    const equipmentSlots = {
+        head: document.getElementById('head')?.value || '',
+        neck: document.getElementById('neck')?.value || '',
+        body: document.getElementById('body')?.value || '',
+        back: document.getElementById('back')?.value || '',
+        hands: document.getElementById('hands')?.value || '',
+        waist: document.getElementById('waist')?.value || '',
+        legs: document.getElementById('legs')?.value || '',
+        feet: document.getElementById('feet')?.value || ''
+    };
+    
+    // Get existing saved data first
+    let existingData = {};
+    const existingSaved = localStorage.getItem('deadWorldCharacter');
+    if (existingSaved) {
         try {
-            characterData = JSON.parse(savedData);
+            existingData = JSON.parse(existingSaved);
         } catch (e) {
-            console.error('Error parsing saved data:', e);
+            console.error('Error parsing existing data:', e);
         }
     }
     
-    // Add professions data
-    characterData.selectedProfessions = window.selectedProfessions || [];
+    // Merge all data together
+    const characterData = {
+        ...existingData,
+        name: document.getElementById('name')?.value || '',
+        age: document.getElementById('age')?.value || '',
+        gender: document.getElementById('gender')?.value || '',
+        background: document.getElementById('background')?.value || '',
+        stats: stats,
+        hp: document.getElementById('hp')?.value || '',
+        ac: document.getElementById('ac')?.value || '',
+        speed: document.getElementById('speed')?.value || '',
+        initiative: document.getElementById('initiative')?.value || '',
+        proficiency: document.getElementById('proficiency')?.value || '',
+        equipmentSlots: equipmentSlots,
+        biteProtection: document.getElementById('biteProtection')?.value || '',
+        shield: document.getElementById('shield')?.value || '',
+        food: document.getElementById('food')?.value || '',
+        water: document.getElementById('water')?.value || '',
+        medicalSupplies: document.getElementById('medicalSupplies')?.value || '',
+        studyMaterials: document.getElementById('studyMaterials')?.value || '',
+        lifeHacks: document.getElementById('lifeHacks')?.value || '',
+        notes: document.getElementById('notes')?.value || '',
+        // Add professions data
+        selectedProfessions: window.selectedProfessions || [],
+        // Add skills data
+        skills: collectSkillsData()
+    };
     
-    // Add skills data
-    characterData.skills = collectSkillsData();
-    
-    // Save back to localStorage
+    // Save all data to localStorage
     localStorage.setItem('deadWorldCharacter', JSON.stringify(characterData));
     
-    console.log('Saved professions to localStorage:', characterData.selectedProfessions);
-    console.log('Saved skills:', characterData.skills);
-    alert('Character saved! Professions: ' + (characterData.selectedProfessions ? characterData.selectedProfessions.length : 0) + ' saved. Skills saved.');
+    console.log('Saved ALL data to localStorage');
+    console.log('Professions saved:', characterData.selectedProfessions);
+    console.log('Skills saved:', characterData.skills);
+    alert('Character saved! Professions: ' + (characterData.selectedProfessions.length || 0) + ' saved. Skills saved.');
+    
+    // Call original if it exists (for any additional processing)
+    if (originalSaveCharacter && originalSaveCharacter !== window.saveCharacter) {
+        try {
+            originalSaveCharacter();
+        } catch (e) {
+            console.log('Original saveCharacter error (expected):', e.message);
+        }
+    }
 };
 
 // Override loadCharacter to restore professions from localStorage (mobile-friendly)
