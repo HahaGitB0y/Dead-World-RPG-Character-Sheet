@@ -59,15 +59,27 @@ function collectSkillsData() {
 
 // Helper function to restore skills data
 function restoreSkillsData(skills) {
-    if (!skills) return;
+    if (!skills || Object.keys(skills).length === 0) {
+        console.log('No skills to restore');
+        return;
+    }
     
-    const skillRows = document.querySelectorAll('.skill-row, tr');
+    console.log('Restoring skills:', skills);
     
-    skillRows.forEach(row => {
-        const skillNameElement = row.querySelector('.skill-name, td:first-child');
-        if (!skillNameElement) return;
+    // Find all table rows in the skills table
+    const skillsTable = document.querySelector('#skillsTable, table');
+    if (!skillsTable) {
+        console.log('Skills table not found for restore');
+        return;
+    }
+    
+    const skillRows = skillsTable.querySelectorAll('tbody tr, tr');
+    
+    skillRows.forEach((row, index) => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length < 2) return;
         
-        const skillName = skillNameElement.textContent.trim().split('(')[0].trim();
+        const skillName = cells[0].textContent.trim().split('(')[0].trim();
         if (!skillName || !skills[skillName]) return;
         
         const checkboxes = row.querySelectorAll('input[type="checkbox"]');
@@ -75,8 +87,11 @@ function restoreSkillsData(skills) {
             checkboxes[0].checked = skills[skillName].N || false;
             checkboxes[1].checked = skills[skillName].P || false;
             checkboxes[2].checked = skills[skillName].E || false;
+            console.log('Restored skill:', skillName, skills[skillName]);
         }
     });
+    
+    console.log('Skills restored successfully');
 }
 
 // Override saveCharacter to include professions and skills
