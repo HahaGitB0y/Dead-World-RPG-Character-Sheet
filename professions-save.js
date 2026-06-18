@@ -1,9 +1,14 @@
 // Professions Save/Load Extension
 // This extends the saveCharacter and loadCharacter functions to include professions and skills data
 
+console.log('=== Professions Save/Load Extension Loading ===');
+
 // Store original functions
 const originalSaveCharacter = window.saveCharacter;
 const originalLoadCharacter = window.loadCharacter;
+
+console.log('Original saveCharacter exists:', typeof originalSaveCharacter === 'function');
+console.log('Original loadCharacter exists:', typeof originalLoadCharacter === 'function');
 
 // Helper function to collect skills data
 function collectSkillsData() {
@@ -56,6 +61,10 @@ function restoreSkillsData(skills) {
 
 // Override saveCharacter to include professions and skills
 window.saveCharacter = function() {
+    console.log('=== Save Character called ===');
+    console.log('selectedProfessions before save:', window.selectedProfessions);
+    console.log('selectedProfessions length:', window.selectedProfessions ? window.selectedProfessions.length : 'undefined');
+    
     // Call original first to save base character data
     if (originalSaveCharacter && originalSaveCharacter !== window.saveCharacter) {
         originalSaveCharacter();
@@ -81,36 +90,53 @@ window.saveCharacter = function() {
     // Save back to localStorage
     localStorage.setItem('deadWorldCharacter', JSON.stringify(characterData));
     
-    console.log('Saved professions:', characterData.selectedProfessions);
+    console.log('Saved professions to localStorage:', characterData.selectedProfessions);
     console.log('Saved skills:', characterData.skills);
-    alert('Character saved! Professions: ' + (window.selectedProfessions ? window.selectedProfessions.length : 0) + ' saved. Skills saved.');
+    alert('Character saved! Professions: ' + (characterData.selectedProfessions ? characterData.selectedProfessions.length : 0) + ' saved. Skills saved.');
 };
 
 // Override loadCharacter to restore professions
 window.loadCharacter = function() {
+    console.log('=== Load Character called ===');
+    
+    // Call original first to load base character data
+    if (originalLoadCharacter && originalLoadCharacter !== window.loadCharacter) {
+        console.log('Calling original loadCharacter');
+        originalLoadCharacter();
+    }
+    
     const savedData = localStorage.getItem('deadWorldCharacter');
     if (!savedData) {
+        console.log('No saved data found');
         alert('No saved character found.');
         return;
     }
     
+    console.log('Saved data found, length:', savedData.length);
+    
     try {
         const characterData = JSON.parse(savedData);
+        console.log('Parsed character data:', characterData);
+        console.log('selectedProfessions in data:', characterData.selectedProfessions);
         
         // Restore professions
         if (characterData.selectedProfessions && Array.isArray(characterData.selectedProfessions)) {
             window.selectedProfessions = characterData.selectedProfessions;
+            console.log('Set window.selectedProfessions to:', window.selectedProfessions);
             
             // Clear existing professions table
             const tbody = document.querySelector('#professionsTable tbody');
             if (tbody) {
                 tbody.innerHTML = '';
+                console.log('Cleared professions table');
             }
             
             // Re-add each profession to the table
-            characterData.selectedProfessions.forEach(prof => {
+            characterData.selectedProfessions.forEach((prof, index) => {
+                console.log('Processing profession', index, ':', prof);
                 if (window.addProfessionToTable && prof.name) {
                     window.addProfessionToTable(prof.name);
+                    console.log('Added profession to table:', prof.name);
                     
                     // Restore XP and level
                     const profId = prof.name.replace(/\s+/g, '-');
@@ -131,12 +157,16 @@ window.loadCharacter = function() {
             });
             
             console.log('Loaded professions:', window.selectedProfessions);
+        } else {
+            console.log('No selectedProfessions found in saved data');
         }
         
         // Restore skills
         if (characterData.skills) {
             restoreSkillsData(characterData.skills);
             console.log('Loaded skills:', characterData.skills);
+        } else {
+            console.log('No skills found in saved data');
         }
         
         alert('Character loaded! Professions: ' + (window.selectedProfessions ? window.selectedProfessions.length : 0) + ' loaded. Skills restored.');
@@ -144,11 +174,6 @@ window.loadCharacter = function() {
     } catch (error) {
         console.error('Error loading character:', error);
         alert('Error loading character: ' + error.message);
-    }
-    
-    // Call original if it exists
-    if (originalLoadCharacter && originalLoadCharacter !== window.loadCharacter) {
-        return originalLoadCharacter();
     }
 };
 
