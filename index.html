@@ -3486,11 +3486,6 @@
         console.log('professions array exists:', typeof professions !== 'undefined');
         console.log('professions array length:', typeof professions !== 'undefined' ? professions.length : 'N/A');
 
-        // Track selected professions (if not already defined)
-        if (typeof selectedProfessions === 'undefined') {
-            var selectedProfessions = [];
-        }
-
         // Initialize profession select dropdown (using existing professions array)
         function initializeProfessionSelect() {
             console.log('initializeProfessionSelect called');
