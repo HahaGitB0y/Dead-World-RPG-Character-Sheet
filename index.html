@@ -3611,6 +3611,259 @@
                 initializeProfessionSelect();
             }
         }, 1000);
+
+        // Professions data with XP requirements and related skills
+        const professions = [
+            // Medical Professions
+            { name: 'Doctor', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Medicine', 'Investigation', 'Insight'] },
+            { name: 'Nurse', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Medicine', 'Persuasion', 'Insight'] },
+            { name: 'Surgeon', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Medicine', 'Investigation', 'Sleight of Hand'] },
+            { name: 'Paramedic', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Medicine', 'Athletics', 'Perception'] },
+            { name: 'Pharmacist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Medicine', 'Investigation', 'Arcana'] },
+            { name: 'Veterinarian', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Animal Handling', 'Medicine', 'Nature'] },
+            { name: 'Psychiatrist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Insight', 'Persuasion', 'Medicine'] },
+            
+            // Technical/Engineering Professions
+            { name: 'Engineer', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Tinkering', 'History'] },
+            { name: 'Electrician', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Tinkering', 'Investigation', 'Perception'] },
+            { name: 'Mechanic', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Athletics', 'Tinkering'] },
+            { name: 'Carpenter', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Athletics', 'Investigation', 'Tinkering'] },
+            { name: 'Plumber', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Athletics', 'Perception'] },
+            { name: 'Welder', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Athletics', 'Investigation', 'Tinkering'] },
+            { name: 'Technician', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Tinkering', 'Arcana'] },
+            { name: 'IT Specialist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Arcana', 'History'] },
+            
+            // Combat/Military Professions
+            { name: 'Soldier', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Athletics', 'Intimidation', 'Perception'] },
+            { name: 'Police Officer', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Perception', 'Intimidation', 'Athletics'] },
+            { name: 'Security Guard', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Perception', 'Intimidation', 'Insight'] },
+            { name: 'Martial Artist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Athletics', 'Acrobatics', 'Insight'] },
+            { name: 'Hunter', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Survival', 'Stealth', 'Athletics'] },
+            { name: 'Marksman', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Perception', 'Stealth', 'Investigation'] },
+            
+            // Survival/Outdoor Professions
+            { name: 'Ranger', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Survival', 'Nature', 'Perception'] },
+            { name: 'Farmer', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Nature', 'Animal Handling', 'Survival'] },
+            { name: 'Fisherman', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Survival', 'Perception', 'Nature'] },
+            { name: 'Trapper', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Survival', 'Stealth', 'Nature'] },
+            { name: 'Guide', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Survival', 'Perception', 'Persuasion'] },
+            { name: 'Scavenger', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Perception', 'Investigation', 'Stealth'] },
+            
+            // Social/Leadership Professions
+            { name: 'Leader', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Persuasion', 'Insight', 'Intimidation'] },
+            { name: 'Politician', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Persuasion', 'Deception', 'Insight'] },
+            { name: 'Teacher', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['History', 'Persuasion', 'Insight'] },
+            { name: 'Negotiator', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Persuasion', 'Insight', 'Deception'] },
+            { name: 'Preacher', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Persuasion', 'Religion', 'Insight'] },
+            { name: 'Diplomat', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Persuasion', 'Insight', 'Deception'] },
+            
+            // Knowledge/Academic Professions
+            { name: 'Scientist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Arcana', 'Investigation', 'History'] },
+            { name: 'Historian', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['History', 'Investigation', 'Arcana'] },
+            { name: 'Librarian', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['History', 'Investigation', 'Arcana'] },
+            { name: 'Archaeologist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['History', 'Investigation', 'Perception'] },
+            { name: 'Chemist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Arcana', 'Investigation', 'Medicine'] },
+            { name: 'Biologist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Nature', 'Investigation', 'Arcana'] },
+            
+            // Criminal/Underworld Professions
+            { name: 'Thief', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Stealth', 'Sleight of Hand', 'Deception'] },
+            { name: 'Smuggler', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Deception', 'Stealth', 'Persuasion'] },
+            { name: 'Hacker', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Arcana', 'Deception'] },
+            { name: 'Con Artist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Deception', 'Persuasion', 'Insight'] },
+            { name: 'Spy', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Stealth', 'Deception', 'Investigation'] },
+            { name: 'Assassin', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Stealth', 'Sleight of Hand', 'Perception'] },
+            
+            // Service/Trade Professions
+            { name: 'Cook', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Nature', 'Survival', 'Perception'] },
+            { name: 'Bartender', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Insight', 'Persuasion', 'Perception'] },
+            { name: 'Merchant', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Persuasion', 'Insight', 'Investigation'] },
+            { name: 'Tailor', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Sleight of Hand', 'Investigation', 'Perception'] },
+            { name: 'Blacksmith', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Athletics', 'Investigation', 'Tinkering'] },
+            { name: 'Jeweler', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Sleight of Hand', 'Investigation', 'Perception'] },
+            
+            // Creative/Artistic Professions
+            { name: 'Musician', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Performance', 'Persuasion', 'Insight'] },
+            { name: 'Artist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Sleight of Hand', 'Perception', 'Insight'] },
+            { name: 'Writer', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['History', 'Persuasion', 'Insight'] },
+            { name: 'Actor', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Performance', 'Deception', 'Persuasion'] },
+            
+            // Transportation Professions
+            { name: 'Pilot', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Perception', 'Tinkering'] },
+            { name: 'Driver', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Perception', 'Athletics', 'Investigation'] },
+            { name: 'Sailor', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Athletics', 'Nature', 'Perception'] },
+            
+            // Communication Professions
+            { name: 'Radio Operator', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Perception', 'Arcana'] },
+            { name: 'Journalist', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Investigation', 'Persuasion', 'Insight'] },
+            { name: 'Interpreter', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Insight', 'Persuasion', 'History'] },
+            
+            // Religious/Spiritual Professions
+            { name: 'Priest', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Religion', 'Persuasion', 'Insight'] },
+            { name: 'Monk', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Religion', 'Insight', 'Athletics'] },
+            { name: 'Shaman', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Religion', 'Nature', 'Arcana'] },
+            
+            // Animal Professions
+            { name: 'Animal Trainer', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Animal Handling', 'Nature', 'Insight'] },
+            { name: 'Zookeeper', xpRequirements: [0, 100, 300, 600, 1000, 1500, 2100], skills: ['Animal Handling', 'Nature', 'Medicine'] }
+        ];
+
+        // Track selected professions
+        let selectedProfessions = [];
+
+        // Initialize profession select dropdown
+        function initializeProfessionSelect() {
+            const select = document.getElementById('professionSelect');
+            if (!select) {
+                console.error('Profession select element not found');
+                return;
+            }
+            
+            // Clear existing options except the first one
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+            
+            console.log('Initializing professions dropdown with', professions.length, 'professions');
+            
+            // Sort professions alphabetically
+            const sortedProfessions = [...professions].sort((a, b) => a.name.localeCompare(b.name));
+            
+            sortedProfessions.forEach(prof => {
+                const option = document.createElement('option');
+                option.value = prof.name;
+                option.textContent = prof.name;
+                select.appendChild(option);
+            });
+            
+            console.log('Professions dropdown initialized successfully with', select.options.length - 1, 'professions');
+        }
+
+        // Add profession to character
+        function addProfession() {
+            const select = document.getElementById('professionSelect');
+            const professionName = select.value;
+            
+            if (!professionName) {
+                alert('Please select a profession first.');
+                return;
+            }
+            
+            // Check if profession already selected
+            if (selectedProfessions.find(p => p.name === professionName)) {
+                alert('This profession is already selected.');
+                return;
+            }
+            
+            const profession = professions.find(p => p.name === professionName);
+            selectedProfessions.push({
+                ...profession,
+                currentXp: 0,
+                currentLevel: 0
+            });
+            
+            addProfessionToTable(professionName);
+            addProfessionSkills(profession);
+            
+            // Reset select
+            select.value = '';
+        }
+
+        // Add profession to table
+        function addProfessionToTable(professionName) {
+            const tbody = document.querySelector('#professionsTable tbody');
+            const profession = professions.find(p => p.name === professionName);
+            
+            const row = document.createElement('tr');
+            row.id = 'profession-' + professionName.replace(/\s+/g, '-');
+            row.innerHTML = `
+                <td>${professionName}</td>
+                <td><span class="profession-level-display" id="level-${professionName.replace(/\s+/g, '-')}">0</span></td>
+                <td><input type="number" class="profession-xp" min="0" placeholder="0" onchange="updateProfessionLevel('${professionName}', this.value)"></td>
+                <td><span class="profession-next-display" id="next-${professionName.replace(/\s+/g, '-')}">100</span></td>
+                <td><button onclick="removeProfession('${professionName}')">Remove</button></td>
+            `;
+            
+            tbody.appendChild(row);
+        }
+
+        // Update profession level based on XP
+        function updateProfessionLevel(professionName, xp) {
+            const profession = professions.find(p => p.name === professionName);
+            const xpValue = parseInt(xp) || 0;
+            
+            let level = 0;
+            for (let i = 0; i < profession.xpRequirements.length; i++) {
+                if (xpValue >= profession.xpRequirements[i]) {
+                    level = i;
+                } else {
+                    break;
+                }
+            }
+            
+            const nextLevelXp = profession.xpRequirements[level + 1] || 'MAX';
+            
+            // Update display
+            const levelElement = document.getElementById('level-' + professionName.replace(/\s+/g, '-'));
+            const nextElement = document.getElementById('next-' + professionName.replace(/\s+/g, '-'));
+            
+            if (levelElement) levelElement.textContent = level;
+            if (nextElement) nextElement.textContent = nextLevelXp === 'MAX' ? 'MAX' : nextLevelXp;
+        }
+
+        // Remove profession
+        function removeProfession(professionName) {
+            selectedProfessions = selectedProfessions.filter(p => p.name !== professionName);
+            
+            const row = document.getElementById('profession-' + professionName.replace(/\s+/g, '-'));
+            if (row) row.remove();
+            
+            removeProfessionSkills(professionName);
+        }
+
+        // Add profession skills to skills table
+        function addProfessionSkills(profession) {
+            profession.skills.forEach(skillName => {
+                const skillRow = document.querySelector(`#skillsTable tr[data-skill="${skillName}"]`);
+                if (skillRow) {
+                    // Add profession indicator to skill row
+                    const profCell = skillRow.querySelector('.skill-professions');
+                    if (profCell && !profCell.textContent.includes(profession.name)) {
+                        const currentText = profCell.textContent;
+                        profCell.textContent = currentText ? currentText + ', ' + profession.name : profession.name;
+                    }
+                }
+            });
+        }
+
+        // Remove profession skills
+        function removeProfessionSkills(professionName) {
+            document.querySelectorAll('#skillsTable tr').forEach(row => {
+                const profCell = row.querySelector('.skill-professions');
+                if (profCell && profCell.textContent.includes(professionName)) {
+                    let professions = profCell.textContent.split(', ').filter(p => p !== professionName);
+                    profCell.textContent = professions.join(', ');
+                }
+            });
+        }
+
+        // Helper function to get stat modifier
+        function getStatModifier(stat) {
+            if (!stat || isNaN(stat)) return 0;
+            const value = parseInt(stat);
+            if (isNaN(value)) return 0;
+            return Math.floor((value - 10) / 2);
+        }
+
+        // Helper function to get skill stat
+        function getSkillStat(skillName) {
+            const skill = skills.find(s => s.name === skillName);
+            return skill ? skill.stat : 'INT';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeProfessionSelect();
+        });
     </script>
 </body>
 </html>
