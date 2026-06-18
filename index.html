@@ -3527,15 +3527,15 @@
             }
             
             // Check if profession already selected
-            if (selectedProfessions.find(p => p.name === professionName)) {
+            if (window.selectedProfessions.find(p => p.name === professionName)) {
                 alert('This profession is already selected.');
                 return;
             }
             
             const profession = professions.find(p => p.name === professionName);
-            selectedProfessions.push({
+            window.selectedProfessions.push({
                 ...profession,
-                currentXp: 0,
+                totalXP: 0,
                 currentLevel: 0
             });
             
@@ -3570,7 +3570,7 @@
             tbody.appendChild(row);
             
             // Initialize profession data
-            const profData = selectedProfessions.find(p => p.name === professionName);
+            const profData = window.selectedProfessions.find(p => p.name === professionName);
             if (profData) {
                 profData.totalXP = 0;
                 profData.currentLevel = 0;
@@ -3579,7 +3579,7 @@
 
         // Adjust profession XP (add or remove)
         function adjustProfessionXP(professionName, deltaXP) {
-            const profData = selectedProfessions.find(p => p.name === professionName);
+            const profData = window.selectedProfessions.find(p => p.name === professionName);
             if (!profData) return;
             
             // Parse the delta value (supports +10, -5, or just 10)
@@ -3633,13 +3633,13 @@
             if (nextElement) nextElement.textContent = nextLevelXp === 'MAX' ? 'MAX' : nextLevelXp;
             
             // Update stored level
-            const profData = selectedProfessions.find(p => p.name === professionName);
+            const profData = window.selectedProfessions.find(p => p.name === professionName);
             if (profData) profData.currentLevel = level;
         }
 
         // Remove profession
         function removeProfession(professionName) {
-            selectedProfessions = selectedProfessions.filter(p => p.name !== professionName);
+            window.selectedProfessions = window.selectedProfessions.filter(p => p.name !== professionName);
             
             const row = document.getElementById('profession-' + professionName.replace(/\s+/g, '-'));
             if (row) row.remove();
