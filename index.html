@@ -1593,6 +1593,35 @@
         let selectedProfessions = [];
 
         
+        // Skill XP thresholds [level 0..6]
+        const skillXPThresholds = [0, 100, 300, 600, 1000, 1500, 2100];
+
+        // Calculate skill level from XP
+        function getSkillLevel(xp) {
+            let level = 0;
+            for (let i = skillXPThresholds.length - 1; i >= 0; i--) {
+                if (xp >= skillXPThresholds[i]) { level = i; break; }
+            }
+            return level;
+        }
+
+        // Calculate modifier from XP (level * 2, displayed as +N)
+        function getSkillModifier(xp) {
+            const level = getSkillLevel(xp);
+            return level > 0 ? '+' + (level * 2) : '0';
+        }
+
+        // Update skill row displays when XP changes
+        function updateSkillLevel(input) {
+            const xp = parseInt(input.value) || 0;
+            const row = input.closest('tr');
+            const level = getSkillLevel(xp);
+            const next = level < 6 ? skillXPThresholds[level + 1] : 'MAX';
+            row.querySelector('.skill-modifier').textContent = getSkillModifier(xp);
+            row.querySelector('.skill-level').textContent = level;
+            row.querySelector('.skill-next').textContent = next;
+        }
+
         // Initialize skills table
         function initializeSkillsTable() {
             const tbody = document.querySelector('#skillsTable tbody');
@@ -1600,7 +1629,7 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td title="${skill.name} (${skill.stat})">${skill.name} (${skill.stat})</td>
-                    <td><input type="text" class="skill-modifier" placeholder="+X"></td>
+                    <td><span class="skill-modifier">0</span></td>
                     <td>
                         <div class="proficiency-checkboxes">
                             <label><input type="radio" name="prof-${skill.name}" value="none"> N</label>
@@ -1608,9 +1637,9 @@
                             <label><input type="radio" name="prof-${skill.name}" value="exp"> E</label>
                         </div>
                     </td>
-                    <td><input type="number" class="skill-level" min="0" max="6" placeholder="0"></td>
-                    <td><input type="number" class="skill-xp" min="0" placeholder="0"></td>
-                    <td><input type="number" class="skill-next" min="0" placeholder="0"></td>
+                    <td><span class="skill-level">0</span></td>
+                    <td><input type="number" class="skill-xp" min="0" placeholder="0" oninput="updateSkillLevel(this)"></td>
+                    <td><span class="skill-next">100</span></td>
                 `;
                 tbody.appendChild(row);
             });
@@ -1784,7 +1813,7 @@
                     
                     row.innerHTML = `
                         <td title="${skillName} (${stat}) - ${description}">${skillName} (${stat})</td>
-                        <td><input type="text" class="skill-modifier" placeholder="+X"></td>
+                        <td><span class="skill-modifier">0</span></td>
                         <td>
                             <div class="proficiency-checkboxes">
                                 <label><input type="radio" name="prof-${skillName}" value="none"> N</label>
@@ -1792,9 +1821,9 @@
                                 <label><input type="radio" name="prof-${skillName}" value="exp"> E</label>
                             </div>
                         </td>
-                        <td><input type="number" class="skill-level" min="0" max="6" placeholder="0"></td>
-                        <td><input type="number" class="skill-xp" min="0" placeholder="0"></td>
-                        <td><input type="number" class="skill-next" min="0" placeholder="0"></td>
+                        <td><span class="skill-level">0</span></td>
+                        <td><input type="number" class="skill-xp" min="0" placeholder="0" oninput="updateSkillLevel(this)"></td>
+                        <td><span class="skill-next">100</span></td>
                     `;
                     tbody.appendChild(row);
                 }

@@ -43,19 +43,12 @@ function collectSkillsData() {
             if (radio.checked) proficiency = radio.value;
         });
         
-        // Modifier text input
-        const modifierInput = row.querySelector('.skill-modifier');
-        // Level, XP, Next number inputs
-        const levelInput = row.querySelector('.skill-level');
+        // XP is the only editable input; modifier/level/next are calculated spans
         const xpInput = row.querySelector('.skill-xp');
-        const nextInput = row.querySelector('.skill-next');
         
         skills[skillName] = {
             proficiency: proficiency,
-            modifier: modifierInput ? modifierInput.value : '',
-            level: levelInput ? levelInput.value : '',
-            xp: xpInput ? xpInput.value : '',
-            next: nextInput ? nextInput.value : ''
+            xp: xpInput ? xpInput.value : ''
         };
     });
     
@@ -92,17 +85,12 @@ function restoreSkillsData(skills) {
             radio.checked = (radio.value === saved.proficiency);
         });
         
-        // Restore modifier
-        const modifierInput = row.querySelector('.skill-modifier');
-        if (modifierInput && saved.modifier !== undefined) modifierInput.value = saved.modifier;
-        
-        // Restore level, XP, next
-        const levelInput = row.querySelector('.skill-level');
+        // Restore XP input then recalculate modifier/level/next
         const xpInput = row.querySelector('.skill-xp');
-        const nextInput = row.querySelector('.skill-next');
-        if (levelInput && saved.level !== undefined) levelInput.value = saved.level;
-        if (xpInput && saved.xp !== undefined) xpInput.value = saved.xp;
-        if (nextInput && saved.next !== undefined) nextInput.value = saved.next;
+        if (xpInput && saved.xp !== undefined) {
+            xpInput.value = saved.xp;
+            if (typeof updateSkillLevel === 'function') updateSkillLevel(xpInput);
+        }
         
         console.log('Restored skill:', skillName, saved);
     });
