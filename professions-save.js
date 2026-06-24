@@ -16,97 +16,95 @@ const originalLoadCharacter = window.loadCharacter;
 console.log('Original saveCharacter exists:', typeof originalSaveCharacter === 'function');
 console.log('Original loadCharacter exists:', typeof originalLoadCharacter === 'function');
 
-// Helper function to collect skills data
+// Helper function to collect skills data (all fields)
 function collectSkillsData() {
     const skills = {};
     
-    // Find all table rows in the skills table
-    const skillsTable = document.querySelector('#skillsTable, table');
+    const skillsTable = document.querySelector('#skillsTable');
     if (!skillsTable) {
         console.log('Skills table not found');
         return skills;
     }
     
-    const skillRows = skillsTable.querySelectorAll('tbody tr, tr');
+    const skillRows = skillsTable.querySelectorAll('tbody tr');
     console.log('Found', skillRows.length, 'skill rows');
-    
-    skillRows.forEach((row, index) => {
-        // Find skill name - first td contains skill name like "Acrobatics (DEX)"
-        const cells = row.querySelectorAll('td');
-        if (cells.length < 2) return;
-        
-        const skillNameCell = cells[0];
-        const skillName = skillNameCell.textContent.trim().split('(')[0].trim();
-        if (!skillName || skillName === 'Skill') return; // Skip header row
-        
-        // Find N/P/E radio buttons in this row
-        const radioButtons = row.querySelectorAll('input[type="radio"]');
-        console.log('Row', index, '- Skill:', skillName, '- Radio buttons found:', radioButtons.length);
-        
-        if (radioButtons.length >= 3) {
-            // Check which radio is selected
-            let n = false, p = false, e = false;
-            radioButtons.forEach(radio => {
-                if (radio.checked) {
-                    if (radio.value === 'none' || radio.value === 'N') n = true;
-                    if (radio.value === 'prof' || radio.value === 'P') p = true;
-                    if (radio.value === 'exp' || radio.value === 'E') e = true;
-                }
-            });
-            
-            skills[skillName] = {
-                N: n,
-                P: p,
-                E: e
-            };
-            console.log('Saved skill:', skillName, skills[skillName]);
-        }
-    });
-    
-    console.log('Total skills collected:', Object.keys(skills).length);
-    return skills;
-}
-
-// Helper function to restore skills data
-function restoreSkillsData(skills) {
-    if (!skills || Object.keys(skills).length === 0) {
-        console.log('No skills to restore');
-        return;
-    }
-    
-    console.log('Restoring skills:', skills);
-    
-    // Find all table rows in the skills table
-    const skillsTable = document.querySelector('#skillsTable, table');
-    if (!skillsTable) {
-        console.log('Skills table not found for restore');
-        return;
-    }
-    
-    const skillRows = skillsTable.querySelectorAll('tbody tr, tr');
     
     skillRows.forEach((row, index) => {
         const cells = row.querySelectorAll('td');
         if (cells.length < 2) return;
         
         const skillName = cells[0].textContent.trim().split('(')[0].trim();
-        if (!skillName || !skills[skillName]) return;
+        if (!skillName || skillName === 'Skill') return;
         
-        // Find N/P/E radio buttons in this row
-        const radioButtons = row.querySelectorAll('input[type="radio"]');
-        if (radioButtons.length >= 3) {
-            // Check the appropriate radio based on saved data
-            radioButtons.forEach(radio => {
-                if (skills[skillName].N && (radio.value === 'none' || radio.value === 'N')) {
-                    radio.checked = true;
-                } else if (skills[skillName].P && (radio.value === 'prof' || radio.value === 'P')) {
-                    radio.checked = true;
-                } else if (skills[skillName].E && (radio.value === 'exp' || radio.value === 'E')) {
-                    radio.checked = true;
-                }
-            });
-            console.log('Restored skill:', skillName, skills[skillName]);
-        }
+        // Proficiency radio (N/P/E)
+        let proficiency = 'none';
+        const radios = row.querySelectorAll('input[type="radio"]');
+        radios.forEach(radio => {
+            if (radio.checked) proficiency = radio.value;
+        });
+        
+        // Modifier text input
+        const modifierInput = row.querySelector('.skill-modifier');
+        // Level, XP, Next number inputs
+        const levelInput = row.querySelector('.skill-level');
+        const xpInput = row.querySelector('.skill-xp');
+        const nextInput = row.querySelector('.skill-next');
+        
+        skills[skillName] = {
+            proficiency: proficiency,
+            modifier: modifierInput ? modifierInput.value : '',
+            level: levelInput ? levelInput.value : '',
+            xp: xpInput ? xpInput.value : '',
+            next: nextInput ? nextInput.value : ''
+        };
+    });
+    
+    console.log('Total skills collected:', Object.keys(skills).length);
+    return skills;
+}
+
+// Helper function to restore skills data (all fields)
+function restoreSkillsData(skills) {
+    if (!skills || Object.keys(skills).length === 0) {
+        console.log('No skills to restore');
+        return;
+    }
+    
+    const skillsTable = document.querySelector('#skillsTable');
+    if (!skillsTable) {
+        console.log('Skills table not found for restore');
+        return;
+    }
+    
+    const skillRows = skillsTable.querySelectorAll('tbody tr');
+    
+    skillRows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length < 2) return;
+        
+        const skillName = cells[0].textContent.trim().split('(')[0].trim();
+        const saved = skills[skillName];
+        if (!skillName || !saved) return;
+        
+        // Restore proficiency radio
+        const radios = row.querySelectorAll('input[type="radio"]');
+        radios.forEach(radio => {
+            radio.checked = (radio.value === saved.proficiency);
+        });
+        
+        // Restore modifier
+        const modifierInput = row.querySelector('.skill-modifier');
+        if (modifierInput && saved.modifier !== undefined) modifierInput.value = saved.modifier;
+        
+        // Restore level, XP, next
+        const levelInput = row.querySelector('.skill-level');
+        const xpInput = row.querySelector('.skill-xp');
+        const nextInput = row.querySelector('.skill-next');
+        if (levelInput && saved.level !== undefined) levelInput.value = saved.level;
+        if (xpInput && saved.xp !== undefined) xpInput.value = saved.xp;
+        if (nextInput && saved.next !== undefined) nextInput.value = saved.next;
+        
+        console.log('Restored skill:', skillName, saved);
     });
     
     console.log('Skills restored successfully');
@@ -249,24 +247,40 @@ window.loadCharacter = function() {
             // Re-add each profession to the table
             characterData.selectedProfessions.forEach((prof, index) => {
                 console.log('Processing profession', index, ':', prof);
-                if (window.addProfessionToTable && prof.name) {
-                    window.addProfessionToTable(prof.name);
+                if (typeof addProfessionToTable === 'function' && prof.name) {
+                    addProfessionToTable(prof.name);
+                    // Also add skills rows for this profession
+                    const profDef2 = (window.professions || []).find(p => p.name === prof.name);
+                    if (profDef2 && typeof addProfessionSkills === 'function') {
+                        addProfessionSkills(profDef2);
+                    }
                     console.log('Added profession to table:', prof.name);
                     
-                    // Restore XP and level
-                    const profId = prof.name.replace(/\s+/g, '-');
-                    const totalElement = document.getElementById('total-xp-' + profId);
-                    const levelElement = document.getElementById('level-' + profId);
-                    const nextElement = document.getElementById('next-' + profId);
-                    
-                    if (totalElement) totalElement.textContent = prof.totalXP || 0;
-                    if (levelElement) levelElement.textContent = prof.currentLevel || 0;
-                    
-                    // Calculate next level XP
-                    const profession = window.professions ? window.professions.find(p => p.name === prof.name) : null;
-                    if (profession && nextElement) {
-                        const nextLevelXp = profession.xpRequirements[(prof.currentLevel || 0) + 1] || 'MAX';
-                        nextElement.textContent = nextLevelXp === 'MAX' ? 'MAX' : nextLevelXp;
+                    // Find the row just added by its id
+                    const rowId = 'profession-' + prof.name.replace(/\s+/g, '-');
+                    const row = document.getElementById(rowId);
+                    if (row) {
+                        // Restore XP input
+                        const xpInput = row.querySelector('.profession-xp');
+                        if (xpInput) {
+                            xpInput.value = prof.totalXP || prof.currentXP || 0;
+                        }
+                        
+                        // Restore level display
+                        const levelDisplay = row.querySelector('.profession-level-display');
+                        if (levelDisplay) levelDisplay.textContent = prof.currentLevel || 0;
+                        
+                        // Restore next XP display
+                        const nextDisplay = row.querySelector('.profession-next-display');
+                        if (nextDisplay) {
+                            const profDef = (window.professions || []).find(p => p.name === prof.name);
+                            if (profDef) {
+                                const lvl = prof.currentLevel || 0;
+                                nextDisplay.textContent = lvl < profDef.xpRequirements.length - 1
+                                    ? profDef.xpRequirements[lvl + 1]
+                                    : 'MAX';
+                            }
+                        }
                     }
                 }
             });
