@@ -171,8 +171,27 @@ window.saveCharacter = function() {
         studyMaterials: document.getElementById('studyMaterials')?.value || '',
         lifeHacks: document.getElementById('lifeHacks')?.value || '',
         notes: document.getElementById('notes')?.value || '',
-        // Add professions data
-        selectedProfessions: window.selectedProfessions || [],
+        // Add professions data - read XP/level from DOM to ensure latest values
+        selectedProfessions: (function() {
+            const profs = window.selectedProfessions || [];
+            return profs.map(prof => {
+                const rowId = 'profession-' + prof.name.replace(/\s+/g, '-');
+                const row = document.getElementById(rowId);
+                if (row) {
+                    const xpInput = row.querySelector('.profession-xp');
+                    const levelDisplay = row.querySelector('.profession-level-display');
+                    const nextDisplay = row.querySelector('.profession-next-display');
+                    return {
+                        ...prof,
+                        totalXP: xpInput ? (parseInt(xpInput.value) || 0) : (prof.totalXP || 0),
+                        currentXP: xpInput ? (parseInt(xpInput.value) || 0) : (prof.currentXP || 0),
+                        currentLevel: levelDisplay ? (parseInt(levelDisplay.textContent) || 0) : (prof.currentLevel || 0),
+                        nextLevelXP: nextDisplay ? nextDisplay.textContent : ''
+                    };
+                }
+                return prof;
+            });
+        })(),
         // Add skills data
         skills: collectSkillsData()
     };
