@@ -1184,7 +1184,8 @@
                     <tr>
                         <th>PROFESSION</th>
                         <th>LEVEL</th>
-                        <th>XP</th>
+                        <th>TOTAL XP</th>
+                        <th>ADD/REMOVE XP</th>
                         <th>NEXT LEVEL</th>
                         <th>ACTION</th>
                     </tr>
@@ -1733,63 +1734,12 @@
             select.value = '';
         }
 
-        // Add profession row to table
-        function addProfessionToTable(professionName) {
-            const tbody = document.querySelector('#professionsTable tbody');
-            const row = document.createElement('tr');
-            row.id = 'profession-' + professionName.replace(/\s+/g, '-');
-            
-            const profession = professions.find(p => p.name === professionName);
-            
-            row.innerHTML = `
-                <td>${professionName}</td>
-                <td><span class="profession-level-display">0</span></td>
-                <td><input type="number" class="profession-xp" min="0" value="0" onchange="updateProfessionLevel('${professionName}', this.value)"></td>
-                <td><span class="profession-next-display">100</span></td>
-                <td><button onclick="removeProfession('${professionName}')" style="padding: 4px 8px; font-size: 12px;">Remove</button></td>
-            `;
-            
-            tbody.appendChild(row);
-        }
-
-        // Update profession level based on XP
-        function updateProfessionLevel(professionName, xp) {
-            const profession = professions.find(p => p.name === professionName);
-            const selectedProf = selectedProfessions.find(p => p.name === professionName);
-            
-            if (!profession || !selectedProf) return;
-            
-            xp = parseInt(xp) || 0;
-            selectedProf.currentXP = xp;
-            
-            // Calculate level based on XP
-            let level = 0;
-            for (let i = profession.xpRequirements.length - 1; i >= 0; i--) {
-                if (xp >= profession.xpRequirements[i]) {
-                    level = i;
-                    break;
-                }
-            }
-            
-            selectedProf.currentLevel = level;
-            
-            // Update display
-            const row = document.getElementById('profession-' + professionName.replace(/\s+/g, '-'));
-            if (row) {
-                row.querySelector('.profession-level-display').textContent = level;
-                const nextLevelXP = level < 6 ? profession.xpRequirements[level + 1] : 'MAX';
-                row.querySelector('.profession-next-display').textContent = nextLevelXP;
-            }
-        }
-
-        // Remove profession
+        // Remove profession (early definition for skill removal)
         function removeProfession(professionName) {
             const row = document.getElementById('profession-' + professionName.replace(/\s+/g, '-'));
-            if (row) {
-                row.remove();
-            }
-            
+            if (row) row.remove();
             selectedProfessions = selectedProfessions.filter(p => p.name !== professionName);
+            window.selectedProfessions = selectedProfessions;
             removeProfessionSkills(professionName);
         }
 

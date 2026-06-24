@@ -163,21 +163,16 @@ window.saveCharacter = function() {
         selectedProfessions: (function() {
             const profs = window.selectedProfessions || [];
             return profs.map(prof => {
-                const rowId = 'profession-' + prof.name.replace(/\s+/g, '-');
-                const row = document.getElementById(rowId);
-                if (row) {
-                    const xpInput = row.querySelector('.profession-xp');
-                    const levelDisplay = row.querySelector('.profession-level-display');
-                    const nextDisplay = row.querySelector('.profession-next-display');
-                    return {
-                        ...prof,
-                        totalXP: xpInput ? (parseInt(xpInput.value) || 0) : (prof.totalXP || 0),
-                        currentXP: xpInput ? (parseInt(xpInput.value) || 0) : (prof.currentXP || 0),
-                        currentLevel: levelDisplay ? (parseInt(levelDisplay.textContent) || 0) : (prof.currentLevel || 0),
-                        nextLevelXP: nextDisplay ? nextDisplay.textContent : ''
-                    };
-                }
-                return prof;
+                const profId = prof.name.replace(/\s+/g, '-');
+                const totalXPEl = document.getElementById('total-xp-' + profId);
+                const levelEl = document.getElementById('level-' + profId);
+                const nextEl = document.getElementById('next-' + profId);
+                return {
+                    ...prof,
+                    totalXP: totalXPEl ? (parseInt(totalXPEl.textContent) || 0) : (prof.totalXP || 0),
+                    currentLevel: levelEl ? (parseInt(levelEl.textContent) || 0) : (prof.currentLevel || 0),
+                    nextLevelXP: nextEl ? nextEl.textContent : ''
+                };
             });
         })(),
         // Add skills data
@@ -263,31 +258,26 @@ window.loadCharacter = function() {
                     }
                     console.log('Added profession to table:', prof.name);
                     
-                    // Find the row just added by its id
-                    const rowId = 'profession-' + prof.name.replace(/\s+/g, '-');
-                    const row = document.getElementById(rowId);
-                    if (row) {
-                        // Restore XP input
-                        const xpInput = row.querySelector('.profession-xp');
-                        if (xpInput) {
-                            xpInput.value = prof.totalXP || prof.currentXP || 0;
-                        }
-                        
-                        // Restore level display
-                        const levelDisplay = row.querySelector('.profession-level-display');
-                        if (levelDisplay) levelDisplay.textContent = prof.currentLevel || 0;
-                        
-                        // Restore next XP display
-                        const nextDisplay = row.querySelector('.profession-next-display');
-                        if (nextDisplay) {
-                            const profDef = (window.professions || []).find(p => p.name === prof.name);
-                            if (profDef) {
-                                const lvl = prof.currentLevel || 0;
-                                nextDisplay.textContent = lvl < profDef.xpRequirements.length - 1
-                                    ? profDef.xpRequirements[lvl + 1]
-                                    : 'MAX';
-                            }
-                        }
+                    // Restore XP/level/next using the element IDs from addProfessionToTable
+                    const profId = prof.name.replace(/\s+/g, '-');
+                    const totalXPEl = document.getElementById('total-xp-' + profId);
+                    const levelEl = document.getElementById('level-' + profId);
+                    const nextEl = document.getElementById('next-' + profId);
+                    
+                    const totalXP = prof.totalXP || 0;
+                    if (totalXPEl) totalXPEl.textContent = totalXP;
+                    if (levelEl) levelEl.textContent = prof.currentLevel || 0;
+                    
+                    // Also update window.selectedProfessions entry with saved XP
+                    const profDataEntry = window.selectedProfessions.find(p => p.name === prof.name);
+                    if (profDataEntry) profDataEntry.totalXP = totalXP;
+                    
+                    // Recalculate next level XP
+                    if (nextEl && profDef2) {
+                        const lvl = prof.currentLevel || 0;
+                        nextEl.textContent = lvl < profDef2.xpRequirements.length - 1
+                            ? profDef2.xpRequirements[lvl + 1]
+                            : 'MAX';
                     }
                 }
             });
