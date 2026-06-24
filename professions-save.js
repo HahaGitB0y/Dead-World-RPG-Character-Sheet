@@ -185,7 +185,7 @@ window.saveCharacter = function() {
     console.log('Saved ALL data to localStorage');
     console.log('Professions saved:', characterData.selectedProfessions);
     console.log('Skills saved:', characterData.skills);
-    alert('Character saved! Professions: ' + (characterData.selectedProfessions.length || 0) + ' saved. Skills saved.');
+    console.log('Character saved! Professions:', characterData.selectedProfessions.length, 'Skills:', Object.keys(characterData.skills).length);
     
     // Call original if it exists (for any additional processing)
     if (originalSaveCharacter && originalSaveCharacter !== window.saveCharacter) {
@@ -204,7 +204,7 @@ window.loadCharacter = function() {
     const savedData = localStorage.getItem('deadWorldCharacter');
     if (!savedData) {
         console.log('No saved data found');
-        alert('No saved character found.');
+        console.log('No saved character found.');
         return;
     }
     
@@ -295,7 +295,7 @@ window.loadCharacter = function() {
             console.log('No skills found in saved data');
         }
         
-        alert('Character loaded! Professions: ' + (window.selectedProfessions ? window.selectedProfessions.length : 0) + ' loaded. Skills restored.');
+        console.log('Character loaded! Professions:', window.selectedProfessions ? window.selectedProfessions.length : 0);
         
     } catch (error) {
         console.error('Error loading character:', error);

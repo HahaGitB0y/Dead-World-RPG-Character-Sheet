@@ -3397,33 +3397,34 @@
             }
         }
 
-        // Auto-save functionality using file system
+        // Auto-save using our professions-save.js saveCharacter (no alert popup)
+        let autoSaveTimeout;
         function autoSave() {
-            try {
-                const characterData = getCharacterData();
-                // Save to localStorage as backup
-                localStorage.setItem('deadWorldCharacter', JSON.stringify(characterData));
-                console.log('Auto-save completed successfully');
-            } catch (error) {
-                console.error('Auto-save failed:', error);
-            }
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(function() {
+                try {
+                    if (typeof window.saveCharacter === 'function') {
+                        // Temporarily suppress the alert
+                        const origAlert = window.alert;
+                        window.alert = function() {};
+                        window.saveCharacter();
+                        window.alert = origAlert;
+                        console.log('Auto-save completed');
+                    }
+                } catch (e) {
+                    console.log('Auto-save error:', e.message);
+                }
+            }, 1500);
         }
 
-        // Add auto-save to all inputs with debouncing
+        // Attach auto-save listeners to all current inputs
         function addAutoSaveListeners() {
-            const inputs = document.querySelectorAll('input, textarea, select');
-            let saveTimeout;
-            
-            inputs.forEach(input => {
-                input.addEventListener('change', () => {
-                    clearTimeout(saveTimeout);
-                    autoSave();
-                });
-                
-                input.addEventListener('input', () => {
-                    clearTimeout(saveTimeout);
-                    saveTimeout = setTimeout(autoSave, 1000); // Save after 1 second of no typing
-                });
+            document.querySelectorAll('input, textarea, select').forEach(input => {
+                if (!input.dataset.autoSave) {
+                    input.dataset.autoSave = '1';
+                    input.addEventListener('change', autoSave);
+                    input.addEventListener('input', autoSave);
+                }
             });
         }
 
@@ -3440,8 +3441,22 @@
             updateStatModifiers(); // Initial calculation
             updateWeaponStats(); // Initial weapon calculation
             
-            // Load saved data on startup
-            loadCharacter();
+            // Auto-load saved data on startup (silently, no alert)
+            setTimeout(function() {
+                try {
+                    if (typeof window.loadCharacter === 'function') {
+                        const origAlert = window.alert;
+                        window.alert = function() {};
+                        window.loadCharacter();
+                        window.alert = origAlert;
+                        console.log('Auto-load completed');
+                        // Re-attach listeners after dynamic rows are added
+                        addAutoSaveListeners();
+                    }
+                } catch(e) {
+                    console.log('Auto-load error:', e.message);
+                }
+            }, 500);
             
             // Add auto-save listeners
             addAutoSaveListeners();
